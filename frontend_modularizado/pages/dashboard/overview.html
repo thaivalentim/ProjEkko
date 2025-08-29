@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EKKO - Dashboard</title>
+    
+    <!-- CSS Base -->
+    <link rel="stylesheet" href="../../assets/css/base/variables.css">
+    <link rel="stylesheet" href="../../assets/css/base/reset.css">
+    <link rel="stylesheet" href="../../assets/css/components/buttons.css">
+    <link rel="stylesheet" href="../../assets/css/components/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/components/theme-toggle.css">
+    <link rel="stylesheet" href="../../assets/css/components/animations.css">
+    <link rel="stylesheet" href="../../assets/css/layouts/header.css">
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-seedling"></i>
+                EKKO
+            </div>
+            <div class="logo-subtitle">Agricultura Inteligente</div>
+        </div>
+        
+        <nav class="nav-menu">
+            <button class="nav-item active" onclick="showSection('dashboard', this)" id="nav-dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </button>
+            <button class="nav-item" onclick="showSection('profile', this)" id="nav-profile" style="display:none;">
+                <i class="fas fa-user-circle"></i>
+                <span>Perfil</span>
+            </button>
+            <button class="nav-item" onclick="showSection('ai', this)" id="nav-ai" style="display:none;">
+                <i class="fas fa-robot"></i>
+                <span>Diagnóstico IA</span>
+            </button>
+            <button class="nav-item" onclick="showSection('heatmap', this)" id="nav-heatmap" style="display:none;">
+                <i class="fas fa-fire"></i>
+                <span>Mapa de Calor</span>
+            </button>
+            <button class="nav-item" onclick="showSection('readings', this)" id="nav-readings" style="display:none;">
+                <i class="fas fa-chart-line"></i>
+                <span>Histórico</span>
+            </button>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="top-bar">
+            <div>
+                <h1 class="page-title" id="page-title">Dashboard</h1>
+                <div class="breadcrumb" id="breadcrumb">Início > Dashboard</div>
+            </div>
+            <div class="user-info">
+                <button onclick="logout()" style="background: none; border: 1px solid var(--gray-300); color: var(--gray-600); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease;" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='none'">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Dashboard -->
+            <section id="dashboard-section" class="content-section active">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                    <div style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--primary-green), var(--secondary-green)); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <h2 style="font-family: 'Poppins', sans-serif; color: var(--gray-900); margin: 0; font-size: 2rem; font-weight: 600; letter-spacing: -0.025em;">Dashboard</h2>
+                </div>
+                <div id="dashboard-content">
+                    <p>Carregando dados do usuário...</p>
+                </div>
+            </section>
+
+            <!-- Perfil -->
+            <section id="profile-section" class="content-section">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                    <div style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--orange), var(--amber)); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <h2 style="font-family: 'Poppins', sans-serif; color: var(--gray-900); margin: 0; font-size: 2rem; font-weight: 600; letter-spacing: -0.025em;">Perfil do Usuário</h2>
+                </div>
+                <div id="profile-content">
+                    <p>Carregando perfil...</p>
+                </div>
+                <div id="mensagem"></div>
+            </section>
+
+            <!-- Diagnóstico IA -->
+            <section id="ai-section" class="content-section">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                    <div style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--purple), var(--indigo)); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h2 style="font-family: 'Poppins', sans-serif; color: var(--gray-900); margin: 0; font-size: 2rem; font-weight: 600; letter-spacing: -0.025em;">Diagnóstico Inteligente</h2>
+                </div>
+                <div id="ai-content">
+                    <p>Carregando análise de IA...</p>
+                </div>
+            </section>
+
+            <!-- Mapa de Calor -->
+            <section id="heatmap-section" class="content-section">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                    <div style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--red), var(--pink)); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <h2 style="font-family: 'Poppins', sans-serif; color: var(--gray-900); margin: 0; font-size: 2rem; font-weight: 600; letter-spacing: -0.025em;">Mapas de Calor</h2>
+                </div>
+                <div id="heatmap-content">
+                    <p>Carregando mapas de calor...</p>
+                </div>
+            </section>
+
+            <!-- Histórico -->
+            <section id="readings-section" class="content-section">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                    <div style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--tech-blue), var(--cyan)); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h2 style="font-family: 'Poppins', sans-serif; color: var(--gray-900); margin: 0; font-size: 2rem; font-weight: 600; letter-spacing: -0.025em;">Histórico de Leituras</h2>
+                </div>
+                <div id="readings-content">
+                    <p>Carregando histórico...</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="../../assets/js/core/utils.js"></script>
+    <script src="../../assets/js/modules/theme.js"></script>
+    <script src="../../assets/js/modules/animations.js"></script>
+    <script src="../../assets/js/modules/dashboard.js"></script>
+    <script src="../../assets/js/modules/dashboard-extended.js"></script>
+</body>
+</html>
