@@ -13,7 +13,7 @@ pip install -r requirements_unity.txt
 ```bash
 python clear_database.py      # Limpa dados antigos
 python data_generator.py      # Gera dados brasileiros realistas
-python optimize_db_structure.py  # Otimiza performance
+python database_structure.py  # Otimiza performance
 ```
 
 ### **3. Iniciar API Unity**
@@ -23,7 +23,7 @@ python start_atlas_api.py
 
 ### **4. Testar Sistema**
 ```bash
-python test_optimized_backend.py
+python test_backend.py
 ```
 
 **✅ Resultado**: API rodando em http://localhost:8001 | Docs: http://localhost:8001/docs

@@ -55,8 +55,8 @@
 |---------|--------|--------|
 | `start_atlas_api.py` | API principal | ✅ Funcionando |
 | `data_generator.py` | Dados realistas | ✅ Otimizado |
-| `optimize_db_structure.py` | Performance BD | ✅ Completo |
-| `test_optimized_backend.py` | Testes | ✅ Passando |
+| `database_structure.py` | Performance BD | ✅ Completo |
+| `test_backend.py` | Testes | ✅ Passando |
 | `clear_database.py` | Limpeza BD | ✅ Funcional |
 | `README.md` | Documentação | ✅ Atualizado |
 | `API_DOCS.md` | API Reference | ✅ Completo |
