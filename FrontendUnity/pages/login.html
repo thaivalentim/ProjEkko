@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EKKO Unity - Login</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: url('../assets/images/Fundo_menu.png') no-repeat;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 100px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+
+        .header.scrolled {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 1rem;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+        }
+
+        .container {
+            position: relative;
+            width: 420px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            padding: 2.5rem;
+            transform: translateY(50px) scale(0.9);
+            opacity: 0;
+            animation: slideInUp 0.8s ease forwards;
+            z-index: 2;
+        }
+
+        @keyframes slideInUp {
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .form-title {
+            font-size: 2rem;
+            color: white;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .form-subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 3rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .input-group .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .input-group input:focus ~ .input-icon {
+            color: rgba(255, 255, 255, 0.9);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.2));
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 500;
+            animation: slideDown 0.3s ease;
+        }
+
+        .message.success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .info-box {
+            background: rgba(33, 150, 243, 0.1);
+            border: 1px solid rgba(33, 150, 243, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .info-box i {
+            color: #2196F3;
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                margin: 1rem;
+                padding: 2rem;
+            }
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav-links">
+            <a href="index.html">Voltar ao Início</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2 class="form-title">
+            <i class="fas fa-gamepad"></i>
+            EKKO Unity
+        </h2>
+        <p class="form-subtitle">Entre com seu Unity ID para acessar o dashboard</p>
+        
+        <div class="info-box">
+            <i class="fas fa-info-circle"></i>
+            Digite apenas seu Unity ID único para acessar seus dados de jogo e visualizar estatísticas no dashboard.
+        </div>
+
+        <form onsubmit="handleUnityLogin(event)">
+            <div class="input-group">
+                <input type="text" id="unityId" placeholder="Seu Unity ID" required>
+                <i class="fas fa-gamepad input-icon"></i>
+            </div>
+            <button type="submit" class="submit-btn" id="loginBtn">
+                <i class="fas fa-play"></i> Entrar no Dashboard
+            </button>
+        </form>
+
+        <div id="messageContainer"></div>
+    </div>
+
+    <script>
+        const baseUrl = "http://127.0.0.1:8002";
+
+        function showMessage(text, type = 'success') {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = `<div class="message ${type}"><i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${text}</div>`;
+            setTimeout(() => container.innerHTML = '', 5000);
+        }
+
+        async function handleUnityLogin(event) {
+            event.preventDefault();
+            
+            const unityId = document.getElementById('unityId').value.trim();
+            const btn = document.getElementById('loginBtn');
+            
+            if (!unityId) {
+                showMessage('Por favor, digite seu Unity ID', 'error');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"><i class="fas fa-spinner"></i> Verificando Unity ID...</span>';
+            
+            try {
+                const response = await fetch(`${baseUrl}/unity/login/${unityId}`);
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    showMessage(`Bem-vindo, ${userData.nome}! Redirecionando...`, 'success');
+                    
+                    localStorage.setItem('unityId', unityId);
+                    localStorage.setItem('unityUser', JSON.stringify(userData));
+                    
+                    setTimeout(() => {
+                        window.location.href = `dashboard.html?unityId=${unityId}`;
+                    }, 1500);
+                } else {
+                    const errorData = await response.json();
+                    showMessage(errorData.detail || 'Unity ID não encontrado', 'error');
+                }
+            } catch (error) {
+                showMessage('Erro de conexão com o servidor Unity', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-play"></i> Entrar no Dashboard';
+            }
+        }
+
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Auto-focus no input
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('unityId').focus();
+        });
+    </script>
+</body>
+</html>

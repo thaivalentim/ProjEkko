@@ -1,137 +1,146 @@
 # 🌱 EKKO - Sistema de Monitoramento de Solo Inteligente
 
-Sistema completo para análise de solo em tempo real com IA para agricultura de precisão.
+Sistema completo para análise de solo em tempo real com IA para agricultura de precisão, agora com **integração Unity** para simulação gamificada.
 
-## 🚀 Início Rápido
+## 🎮 **NOVO: Unity Integration**
+
+Sistema expandido com simulação Unity para experiência gamificada de agricultura.
+
+### 🚀 Início Rápido Unity
 
 ```bash
-# 1. Instalar dependências
-pip install -r requirements.txt
+# 1. Backend Unity
+cd EkkoUnity
+pip install -r requirements_unity.txt
+python start_atlas_api.py
 
-# 2. Configurar .env
-MONGO_URI=sua_conexao_mongodb
-MONGO_DB_NAME=EKKO_database
-
-# 3. Iniciar sistema
-python start_api.py
-
-# 4. Gerar dados de teste
-python EkkoPython/dataGenerator.py
-
-# 5. Executar testes
-python run_tests.py
+# 2. Frontend Unity
+cd ../FrontendUnity
+# Abrir pages/index.html no navegador
 ```
 
-**Acesso**: http://localhost:8000 | **Frontend**: `frontend/pages/index.html` | **Docs**: http://localhost:8000/docs
+**Acesso Unity**: http://localhost:8002 | **Dashboard**: `FrontendUnity/pages/index.html` | **Docs**: http://localhost:8002/docs
 
-## 📁 Estrutura
+## 📁 Estrutura Atual
 
 ```
 ProjEkko/
-├── EkkoAPI/           # API FastAPI com IA e autenticação
-├── EkkoPython/        # Gerador de dados realistas
-├── frontend/pages/    # Interface web moderna
-│   ├── index.html     # Página inicial profissional
-│   ├── login.html     # Sistema de login/cadastro
-│   └── dashboard.html # Dashboard completo
-├── tests/             # Testes automatizados (100% cobertura)
-└── requirements.txt   # Dependências Python
+├── EkkoUnity/              # 🎮 Sistema Unity (ATIVO)
+│   ├── start_atlas_api.py  # API principal MongoDB Atlas
+│   ├── requirements_unity.txt
+│   ├── README.md           # Documentação completa
+│   ├── PROGRESSO.md        # Status desenvolvimento
+│   └── UNITY.md            # Especificações para Unity
+├── FrontendUnity/          # 🎨 Interface Unity (ATIVO)
+│   ├── pages/              # HTML pages
+│   ├── css/                # Estilos modernos
+│   ├── js/                 # JavaScript modular
+│   ├── README.md           # Documentação frontend
+│   └── PROGRESSO.md        # Status frontend
+├── Obsoleto/               # 📦 Arquivos antigos
+│   ├── EkkoAPI/            # API original
+│   ├── EkkoPython/         # Gerador original
+│   ├── frontend/           # Frontend original
+│   └── tests/              # Testes originais
+└── README.md               # Esta documentação
 ```
 
-## ✅ Funcionalidades Implementadas
+## ✅ Sistema Unity - Funcionalidades
 
-### 🔧 **Backend (API)**
-- **Sistema de Autenticação** - JWT tokens, login/registro
-- **CRUD Usuários** - Gestão completa de agricultores
-- **Perfis Detalhados** - Dados pessoais, técnicos e propriedade
-- **Leituras de Solo** - 13 parâmetros monitorados
-- **IA Diagnóstico** - Análise inteligente com sugestões
-- **Análise Histórica** - Tendências e recomendações
-- **Acesso Admin** - Dashboard direto por ID de usuário
+### 🔧 **Backend Unity (EkkoUnity/)**
+- **API FastAPI** com MongoDB Atlas
+- **Sistema IA Avançado** - 9 parâmetros de solo
+- **Autenticação Unity ID** - Login simples
+- **Análise Completa** - pH, umidade, temperatura, salinidade, NPK, condutividade, performance
+- **Previsões Inteligentes** - Colheita, economia, sustentabilidade
+- **Alertas Automáticos** - Parâmetros críticos
+- **Recomendações Personalizadas** - Por região e cultivo
 
-### 🎨 **Frontend**
-- **Página Inicial Moderna** - Design profissional com glassmorphism
-- **Sistema de Login/Cadastro** - Autenticação JWT com animações
-- **Dashboard Responsivo** - Interface completa e intuitiva
-- **Visualização Completa** - Todos os dados do banco exibidos
-- **Status em Tempo Real** - Indicadores visuais de saúde do solo
-- **Navegação Fluida** - Transições suaves e UX otimizada
+### 🎨 **Frontend Unity (FrontendUnity/)**
+- **Dashboard Moderno** - Tema gaming Unity
+- **6 Seções Completas** - Início, Perfil, IA & Solo, Estatísticas, Unity, Monitoramento
+- **Visualizações Avançadas** - Mapas de calor, timeline, gráficos
+- **Design Responsivo** - Desktop, tablet, mobile
+- **UX Otimizada** - Loading states, error handling, navegação fluida
 
-### 🤖 **IA & Análise**
-- **Diagnóstico Automático** - Baseado em regras agronômicas
-- **Alertas Inteligentes** - Detecção de problemas críticos
-- **Sugestões Personalizadas** - Por tipo de cultivo
-- **Análise de Tendências** - Evolução temporal dos parâmetros
+### 🧠 **IA Avançada - 9 Parâmetros**
+1. **pH do Solo** (6.0-7.0)
+2. **Umidade** (40-70%)
+3. **Temperatura** (20-30°C)
+4. **Salinidade** (< 600 ppm)
+5. **Nitrogênio** (20-100 mg/kg)
+6. **Fósforo** (15-50 mg/kg)
+7. **Potássio** (100-250 mg/kg)
+8. **Condutividade** (< 1.5 dS/m)
+9. **Performance Unity** (> 800 pts)
 
-### 📊 **Dados Monitorados**
-- **Solo**: pH, umidade, temperatura, condutividade, salinidade
-- **Nutrientes**: NPK (Nitrogênio, Fósforo, Potássio)
-- **Micronutrientes**: Cálcio, Magnésio, Enxofre
-- **Propriedades**: Matéria orgânica, densidade do solo
-- **Sensores**: Qualidade sinal, bateria, localização
+## 🎯 Para Desenvolvedores Unity
 
-## 🛠️ Stack Tecnológica
+### 📋 **Dados Necessários**
+Consulte `EkkoUnity/UNITY.md` para especificações completas:
 
-- **Backend**: Python 3.x, FastAPI, PyMongo, JWT Auth
-- **Banco**: MongoDB com dados brasileiros realistas
-- **Frontend**: HTML5, CSS3 (Glassmorphism), JavaScript (Vanilla)
-- **IA**: Análise baseada em regras agronômicas
-- **Testes**: pytest com 100% cobertura
-- **Deploy**: Uvicorn, Docker-ready
-- **Localização**: Santa Rita do Sapucaí, MG
+- **Parâmetros de Solo** - pH, umidade, temperatura, salinidade, condutividade
+- **Nutrientes** - NPK (nitrogênio, fósforo, potássio)
+- **Ações do Jogador** - Irrigação, fertilizantes aplicados
+- **Métricas do Jogo** - Score, dinheiro gasto, sustentabilidade
+- **Metadados** - Session ID, Unity ID
 
-## 📊 Endpoints da API
+### 🔗 **Endpoint Principal**
+```http
+POST http://localhost:8002/unity/soil/save/{unity_id}
+```
+
+## 📊 Endpoints Unity API
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| POST | `/auth/login` | Login de usuário |
-| POST | `/auth/register` | Registro de novo usuário |
-| GET | `/usuarios` | Lista todos os usuários |
-| POST | `/usuarios` | Cria novo usuário |
-| GET | `/usuarios/{id}` | Busca usuário específico |
-| GET | `/perfil/{id}` | Perfil completo com leituras |
-| PUT | `/perfil/{id}` | Atualiza dados do perfil |
-| GET | `/leituras_solo/{id}` | Histórico de leituras |
-| GET | `/diagnostico/{id}` | Diagnóstico IA completo |
-| GET | `/analise-rapida/{id}` | Análise da última leitura |
+| GET | `/unity/status` | Status da API e banco |
+| GET | `/unity/login/{unity_id}` | Login por Unity ID |
+| GET | `/unity/dashboard/{unity_id}` | Dados completos dashboard |
+| POST | `/unity/soil/save/{unity_id}` | Salvar dados Unity |
+| GET | `/unity/analise-ia/{unity_id}` | Análise IA (9 parâmetros) |
+| GET | `/unity/recreate-test-data` | Recriar dados teste |
 
-## 🧪 Testes & Qualidade
+## 🛠️ Stack Tecnológica Unity
 
-- ✅ **100% Cobertura** - Todos os módulos testados
-- ✅ **Testes Unitários** - IA, gerador, validações
-- ✅ **Testes Integração** - API endpoints completos
-- ✅ **Dados Realistas** - Baseados em parâmetros brasileiros
-- ✅ **Validação Automática** - Estrutura e tipos de dados
+- **Backend**: Python 3.x, FastAPI, PyMongo, MongoDB Atlas
+- **Frontend**: HTML5, CSS3 (Glassmorphism), JavaScript (Vanilla), Chart.js
+- **IA**: Análise baseada em regras agronômicas brasileiras
+- **Banco**: MongoDB Atlas (nuvem)
+- **Design**: Tema gaming Unity moderno
+- **Localização**: Santa Rita do Sapucaí, MG
 
-## 🔒 Segurança & Configuração
+## 🏆 Status do Projeto
 
-- **Credenciais**: Armazenadas em `.env`
-- **Validação**: Entrada de dados rigorosa
-- **Tratamento**: Erros seguros sem exposição
-- **CORS**: Configurado para desenvolvimento
-- **MongoDB**: Conexão testada e otimizada
+| Sistema | Status | Funcionalidade |
+|---------|--------|----------------|
+| **Unity Backend** | ✅ Produção | API completa + IA |
+| **Unity Frontend** | ✅ Produção | Dashboard moderno |
+| **Integração Unity** | ✅ Especificado | UNITY.md completo |
+| **Documentação** | ✅ Completa | READMEs + PROGRESSO |
+| **Sistema Original** | 📦 Obsoleto | Movido para /Obsoleto |
 
 ## 🚀 Próximos Passos
 
-- [x] Autenticação JWT
-- [x] Interface moderna e responsiva
-- [ ] Alertas em tempo real
-- [ ] Relatórios PDF
-- [ ] App mobile
-- [ ] Machine Learning avançado
-- [ ] Integração IoT
-- [ ] Notificações push
+- [ ] **Integração Unity Real** - Conectar simulação
+- [ ] **Otimização Performance** - Cache e otimizações
+- [ ] **Monitoramento Real** - Sensores IoT
+- [ ] **App Mobile** - PWA ou nativo
+- [ ] **Machine Learning** - Modelos avançados
+- [ ] **Relatórios PDF** - Exportação automática
 
-## 📈 Status do Projeto
+## 📈 Evolução do Projeto
 
-| Aspecto | Status | Cobertura |
-|---------|--------|-----------|
-| **Backend API** | ✅ Completo | 100% |
-| **Autenticação** | ✅ Implementada | 100% |
-| **Frontend** | ✅ Moderno | 100% |
-| **IA Diagnóstico** | ✅ Funcional | 100% |
-| **Testes** | ✅ Aprovados | 100% |
-| **UX/UI** | ✅ Profissional | 100% |
+1. **v1.0** - Sistema original Python + FastAPI ✅
+2. **v2.0** - **Unity Integration** com IA avançada ✅
+3. **v3.0** - Integração Unity real (em desenvolvimento)
 
 ---
-**EKKO** - Agricultura Inteligente 🌾 | **Santa Rita do Sapucaí, MG** | **Status**: Produção Ready 🚀
+
+**EKKO Unity** - Agricultura Gamificada 🎮🌾 | **Santa Rita do Sapucaí, MG** | **Status**: Unity Ready 🚀
+
+### 📞 Suporte
+- **Backend Unity**: `EkkoUnity/README.md`
+- **Frontend Unity**: `FrontendUnity/README.md`
+- **Especificações Unity**: `EkkoUnity/UNITY.md`
+- **Sistema Original**: `Obsoleto/` (arquivado)

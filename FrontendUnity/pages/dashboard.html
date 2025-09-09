@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EKKO Unity - Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-gamepad"></i>
+                EKKO Unity
+            </div>
+            <div class="logo-subtitle">Agricultura Gamificada</div>
+        </div>
+        
+        <nav class="nav-menu">
+            <button class="nav-item active" onclick="showSection('dashboard', this)" id="nav-dashboard">
+                <i class="fas fa-home"></i>
+                <span>Início</span>
+            </button>
+            <button class="nav-item" onclick="showSection('profile', this)" id="nav-profile" style="display:none;">
+                <i class="fas fa-user-circle"></i>
+                <span>Perfil</span>
+            </button>
+            <button class="nav-item" onclick="showSection('ai', this)" id="nav-ai" style="display:none;">
+                <i class="fas fa-robot"></i>
+                <span>IA & Solo</span>
+            </button>
+            <button class="nav-item" onclick="showSection('heatmap', this)" id="nav-heatmap" style="display:none;">
+                <i class="fas fa-chart-bar"></i>
+                <span>Estatísticas</span>
+            </button>
+            <button class="nav-item" onclick="showSection('readings', this)" id="nav-readings" style="display:none;">
+                <i class="fas fa-gamepad"></i>
+                <span>Unity</span>
+            </button>
+            <button class="nav-item" onclick="showSection('monitoring', this)" id="nav-monitoring" style="display:none;">
+                <i class="fas fa-satellite-dish"></i>
+                <span>Monitoramento Real Time</span>
+            </button>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="top-bar">
+            <div>
+                <h1 class="page-title" id="page-title">Início</h1>
+                <div class="breadcrumb" id="breadcrumb">Início</div>
+            </div>
+            <div class="user-info">
+                <button onclick="logout()" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Início -->
+            <section id="dashboard-section" class="content-section active">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <h2>Início</h2>
+                </div>
+                <div id="dashboard-content">
+                    <p>Carregando dados Unity...</p>
+                </div>
+            </section>
+
+            <!-- Perfil -->
+            <section id="profile-section" class="content-section">
+                <div class="section-header">
+                    <div class="section-icon unity-orange">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <h2>Perfil</h2>
+                </div>
+                <div id="profile-content">
+                    <p>Carregando perfil Unity...</p>
+                </div>
+                <div id="mensagem"></div>
+            </section>
+
+            <!-- IA & Solo -->
+            <section id="ai-section" class="content-section">
+                <div class="section-header">
+                    <div class="section-icon unity-purple">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h2>IA & Solo</h2>
+                </div>
+                <div id="ai-content">
+                    <p>Carregando análise de IA...</p>
+                </div>
+            </section>
+
+            <!-- Estatísticas -->
+            <section id="heatmap-section" class="content-section">
+                <div class="section-header">
+                    <div class="section-icon unity-red">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h2>Estatísticas</h2>
+                </div>
+                <div id="heatmap-content">
+                    <p>Carregando mapas Unity...</p>
+                </div>
+            </section>
+
+            <!-- Unity -->
+            <section id="readings-section" class="content-section">
+                <div class="section-header">
+                    <div class="section-icon unity-blue">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <h2>Unity</h2>
+                </div>
+                <div id="readings-content">
+                    <p>Carregando histórico...</p>
+                </div>
+            </section>
+
+            <!-- Monitoramento Real Time -->
+            <section id="monitoring-section" class="content-section">
+                <div class="section-header">
+                    <div class="section-icon unity-green">
+                        <i class="fas fa-satellite-dish"></i>
+                    </div>
+                    <h2>Monitoramento Real Time</h2>
+                </div>
+                <div id="monitoring-content">
+                    <p>Carregando monitoramento em tempo real...</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="../js/unity-dashboard.js"></script>
+</body>
+</html>
