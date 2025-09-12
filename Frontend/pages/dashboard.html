@@ -15,7 +15,7 @@
         <div class="sidebar-header">
             <div class="logo">
                 <i class="fas fa-gamepad"></i>
-                EKKO Unity
+                ekko
             </div>
             <div class="logo-subtitle">Agricultura Gamificada</div>
         </div>
@@ -29,6 +29,10 @@
                 <i class="fas fa-user-circle"></i>
                 <span>Perfil</span>
             </button>
+            <button class="nav-item" onclick="showSection('readings', this)" id="nav-readings" style="display:none;">
+                <i class="fas fa-gamepad"></i>
+                <span>Unity</span>
+            </button>
             <button class="nav-item" onclick="showSection('ai', this)" id="nav-ai" style="display:none;">
                 <i class="fas fa-robot"></i>
                 <span>IA & Solo</span>
@@ -37,13 +41,13 @@
                 <i class="fas fa-chart-bar"></i>
                 <span>Estatísticas</span>
             </button>
-            <button class="nav-item" onclick="showSection('readings', this)" id="nav-readings" style="display:none;">
-                <i class="fas fa-gamepad"></i>
-                <span>Unity</span>
-            </button>
             <button class="nav-item" onclick="showSection('monitoring', this)" id="nav-monitoring" style="display:none;">
                 <i class="fas fa-satellite-dish"></i>
                 <span>Monitoramento Real Time</span>
+            </button>
+            <button class="nav-item" onclick="showSection('development', this)" id="nav-development" style="display:none;">
+                <i class="fas fa-code"></i>
+                <span>Desenvolvimento</span>
             </button>
         </nav>
     </aside>
@@ -81,7 +85,7 @@
                     <div class="section-icon unity-orange">
                         <i class="fas fa-user-circle"></i>
                     </div>
-                    <h2>Perfil</h2>
+                    <h2 id="profile-greeting">Perfil</h2>
                 </div>
                 <div id="profile-content">
                     <p>Carregando perfil Unity...</p>
@@ -125,6 +129,19 @@
                 </div>
                 <div id="readings-content">
                     <p>Carregando histórico...</p>
+                </div>
+            </section>
+
+            <!-- Desenvolvimento -->
+            <section id="development-section" class="content-section">
+                <div class="section-header">
+                    <div class="section-icon unity-cyan">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h2>Desenvolvimento</h2>
+                </div>
+                <div id="development-content">
+                    <p>Carregando documentação técnica...</p>
                 </div>
             </section>
 

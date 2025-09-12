@@ -67,6 +67,7 @@ const UnityDashboard = {
             this.loadProfileContent(data);
             this.loadReadingsContent(data);
             this.loadHeatmapContent(data);
+            this.loadDevelopmentContent(data);
             this.loadMonitoringContent(data);
             
             // IA de forma assíncrona
@@ -77,7 +78,7 @@ const UnityDashboard = {
             }, 100);
             
             this.showSection('dashboard', document.getElementById('nav-dashboard'));
-            this.showMessage(`Perfil Unity de ${data.profile.dados_pessoais?.nome || 'Jogador'} carregado!`, 'success', 3000);
+            this.showMessage(`Perfil Unity carregado com sucesso!`, 'success', 3000);
             
         } catch (error) {
             console.error('Erro Unity:', error);
@@ -108,60 +109,228 @@ const UnityDashboard = {
         const playerActions = soilData.player_actions || {};
 
         document.getElementById('dashboard-content').innerHTML = `
-            <!-- Métricas Unity -->
-            <div class="unity-metrics">
-                <div class="unity-metric-card" style="border-left-color: var(--primary-green);">
-                    <div class="unity-metric-value" style="color: var(--primary-green);">${Number(soilParams.ph || 0).toFixed(1)}</div>
-                    <div class="unity-metric-label">pH do Solo</div>
-                    <div class="unity-metric-status" style="color: ${Number(soilParams.ph || 0) >= 6.0 && Number(soilParams.ph || 0) <= 7.0 ? 'var(--primary-green)' : 'var(--orange)'};">
-                        ${Number(soilParams.ph || 0) >= 6.0 && Number(soilParams.ph || 0) <= 7.0 ? '✓ Ideal' : '⚠ Atenção'}
-                    </div>
-                </div>
+            <!-- Hero Section -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 3rem 2rem; margin-bottom: 2rem; color: white; text-align: center; position: relative; overflow: hidden;">
+                <!-- Background Pattern -->
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
                 
-                <div class="unity-metric-card" style="border-left-color: var(--tech-blue);">
-                    <div class="unity-metric-value" style="color: var(--tech-blue);">${Number(soilParams.umidade || 0).toFixed(0)}%</div>
-                    <div class="unity-metric-label">Umidade</div>
-                    <div class="unity-metric-status" style="color: ${Number(soilParams.umidade || 0) >= 40 && Number(soilParams.umidade || 0) <= 70 ? 'var(--primary-green)' : 'var(--orange)'};">
-                        ${Number(soilParams.umidade || 0) >= 40 && Number(soilParams.umidade || 0) <= 70 ? '✓ Ideal' : '⚠ Atenção'}
-                    </div>
-                </div>
-                
-                <div class="unity-metric-card" style="border-left-color: var(--orange);">
-                    <div class="unity-metric-value" style="color: var(--orange);">${Number(soilParams.temperatura || 0).toFixed(0)}°C</div>
-                    <div class="unity-metric-label">Temperatura</div>
-                    <div class="unity-metric-status" style="color: ${Number(soilParams.temperatura || 0) >= 20 && Number(soilParams.temperatura || 0) <= 30 ? 'var(--primary-green)' : 'var(--orange)'};">
-                        ${Number(soilParams.temperatura || 0) >= 20 && Number(soilParams.temperatura || 0) <= 30 ? '✓ Ideal' : '⚠ Atenção'}
-                    </div>
-                </div>
-                
-                <div class="unity-metric-card" style="border-left-color: var(--purple);">
-                    <div class="unity-metric-value" style="color: var(--purple);">${gameMetrics.score || 0}</div>
-                    <div class="unity-metric-label">Score Unity</div>
-                    <div class="unity-metric-status" style="color: var(--gray-500);">Última sessão</div>
-                </div>
-            </div>
-            
-            <!-- Cards Unity -->
-            <div class="unity-info-grid">
-                <!-- Perfil Unity -->
-                <div class="unity-card">
-                    <div class="unity-card-header">
-                        <div class="unity-card-icon">
-                            <i class="fas fa-gamepad"></i>
+                <div style="position: relative; z-index: 1;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 50%; backdrop-filter: blur(10px);">
+                            <i class="fas fa-seedling" style="font-size: 2.5rem; color: #4ade80;"></i>
                         </div>
-                        <div>
-                            <h3 class="unity-card-title">${profile.dados_pessoais?.nome || 'Jogador Unity'}</h3>
-                            <p class="unity-card-subtitle">
-                                <i class="fas fa-tractor" style="color: var(--primary-green);"></i>
-                                ${dashboardData.propriedade || 'Fazenda Unity'}
-                            </p>
+                        <h1 style="margin: 0; font-size: 2.5rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Bem-vindo ao website Ekko!</h1>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 50%; backdrop-filter: blur(10px);">
+                            <i class="fas fa-gamepad" style="font-size: 2.5rem; color: #60a5fa;"></i>
                         </div>
                     </div>
                     
-                    <div>
-                        <h4 style="color: var(--gray-800); margin-bottom: 1rem; font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-user" style="color: var(--tech-blue);"></i> Dados Unity
-                        </h4>
+                    <p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.95; max-width: 700px; margin-left: auto; margin-right: auto;">Aqui, você pode monitorar tanto os dados da sua simulação com os sensores da Unity quanto as análises feitas a partir deles.</p>
+                </div>
+            </div>
+            
+            <!-- About Section -->
+            <div class="unity-card" style="margin-bottom: 2rem; background: var(--white); border: none; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 16px;">
+                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; align-items: center;">
+                    <!-- Left Side - Visual -->
+                    <div style="text-align: center; padding: 2rem;">
+                        <div style="background: linear-gradient(135deg, var(--secondary-green), var(--primary-green)); width: 120px; height: 120px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);">
+                            <i class="fas fa-leaf" style="font-size: 3rem; color: white;"></i>
+                        </div>
+                        <h3 style="color: var(--gray-800); margin-bottom: 0.5rem; font-size: 1.3rem;">Projeto Sustentável</h3>
+                        <p style="color: var(--gray-600); font-size: 0.9rem;">Tecnologia a serviço do meio ambiente</p>
+                    </div>
+                    
+                    <!-- Right Side - Content -->
+                    <div style="padding: 1rem;">
+                        <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05)); padding: 1.5rem; border-radius: 12px; border-left: 4px solid #667eea; margin-bottom: 1.5rem;">
+                            <p style="color: var(--gray-700); line-height: 1.7; margin: 0; font-size: 1rem;">Ekko é um projeto desenvolvido pela <strong style="color: var(--tech-blue);">equipe 34DS08</strong>, do curso Desenvolvimento de Sistemas, para a <strong style="color: var(--purple);">44ª Projete</strong>, a feira tecnológica da ETE FMC. Em 2025, o tema da feira engloba a promoção da <strong style="color: var(--secondary-green);">sustentabilidade</strong>, que é um dos objetivos principais do Ekko: auxiliar agricultores e autônomos a cuidarem do meio ambiente por meio da tecnologia.</p>
+                        </div>
+                        
+                        <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.05), rgba(16, 185, 129, 0.05)); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--secondary-green);">
+                            <p style="color: var(--gray-700); line-height: 1.7; margin: 0; font-size: 1rem;">Ele contempla soluções principalmente de software: por meio de uma <strong style="color: var(--orange);">simulação gamificada</strong>, desenvolvida na plataforma Unity, o jogador aprende a manusear um dispositivo móvel que controla diversos sensores, coletando continuamente informações de inúmeros parâmetros do solo, como <strong style="color: var(--tech-blue);">pH, umidade, temperatura e nutrientes</strong>. Os dados dessa simulação são comunicados com este website, no qual o usuário tem acesso à <strong style="color: var(--purple);">Inteligência Artificial, gráficos e estatísticas</strong>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                
+            <!-- Project Stats -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;">
+                <div style="text-align: center; padding: 2rem 1.5rem; background: linear-gradient(135deg, var(--white), #f8fafc); border-radius: 16px; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1); border: 2px solid rgba(59, 130, 246, 0.1); transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div style="background: linear-gradient(135deg, var(--tech-blue), #3b82f6); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                        <i class="fas fa-school" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div style="font-size: 1.1rem; color: var(--gray-800); font-weight: 600; margin-bottom: 0.25rem;">Projete</div>
+                    <div style="font-size: 0.9rem; color: var(--gray-500);">ETE FMC</div>
+                </div>
+                
+                <div style="text-align: center; padding: 2rem 1.5rem; background: linear-gradient(135deg, var(--white), #faf5ff); border-radius: 16px; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.1); border: 2px solid rgba(139, 92, 246, 0.1); transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div style="background: linear-gradient(135deg, var(--purple), #8b5cf6); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                        <i class="fas fa-leaf" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div style="font-size: 1.1rem; color: var(--gray-800); font-weight: 600; margin-bottom: 0.25rem;">Sustentabilidade</div>
+                    <div style="font-size: 0.9rem; color: var(--gray-500);">Tema Central</div>
+                </div>
+                
+                <div style="text-align: center; padding: 2rem 1.5rem; background: linear-gradient(135deg, var(--white), #f0fdf4); border-radius: 16px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.1); border: 2px solid rgba(34, 197, 94, 0.1); transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div style="background: linear-gradient(135deg, var(--secondary-green), #10b981); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                        <i class="fas fa-users" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div style="font-size: 1.1rem; color: var(--gray-800); font-weight: 600; margin-bottom: 0.25rem;">Equipe</div>
+                    <div style="font-size: 0.9rem; color: var(--gray-500);">Desenvolvimento</div>
+                </div>
+                
+                <div style="text-align: center; padding: 2rem 1.5rem; background: linear-gradient(135deg, var(--white), #fff7ed); border-radius: 16px; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.1); border: 2px solid rgba(249, 115, 22, 0.1); transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div style="background: linear-gradient(135deg, var(--orange), #f97316); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                        <i class="fab fa-unity" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div style="font-size: 1.1rem; color: var(--gray-800); font-weight: 600; margin-bottom: 0.25rem;">Unity</div>
+                    <div style="font-size: 0.9rem; color: var(--gray-500);">Simulação</div>
+                </div>
+            </div>
+            </div>
+            
+            <!-- Principais Funcionalidades -->
+            <div class="unity-card" style="margin-bottom: 2rem;">
+                <h3 style="color: var(--gray-800); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem;">
+                    <i class="fas fa-rocket" style="color: var(--primary-green);"></i> Principais Funcionalidades
+                </h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+                    <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05)); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--primary-green);">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="background: var(--primary-green); color: white; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-robot" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <h4 style="margin: 0; color: var(--gray-800); font-size: 1.1rem;">IA Avançada</h4>
+                        </div>
+                        <p style="color: var(--gray-700); margin: 0; line-height: 1.5;">Análise inteligente de 9 parâmetros do solo com recomendações personalizadas em tempo real</p>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05)); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--tech-blue);">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="background: var(--tech-blue); color: white; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-gamepad" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <h4 style="margin: 0; color: var(--gray-800); font-size: 1.1rem;">Gamificação</h4>
+                        </div>
+                        <p style="color: var(--gray-700); margin: 0; line-height: 1.5;">Aprenda agricultura de forma divertida com sistema de pontuação, conquistas e desafios</p>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(249, 115, 22, 0.05)); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--orange);">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="background: var(--orange); color: white; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-satellite-dish" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <h4 style="margin: 0; color: var(--gray-800); font-size: 1.1rem;">IoT & Sensores</h4>
+                        </div>
+                        <p style="color: var(--gray-700); margin: 0; line-height: 1.5;">Monitoramento contínuo com sensores IoT para pH, umidade, temperatura e nutrientes</p>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(139, 92, 246, 0.05)); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--purple);">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="background: var(--purple); color: white; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-chart-line" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <h4 style="margin: 0; color: var(--gray-800); font-size: 1.1rem;">Dashboard Completo</h4>
+                        </div>
+                        <p style="color: var(--gray-700); margin: 0; line-height: 1.5;">Visualizações avançadas com mapas de calor, gráficos e relatórios detalhados</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Status do Projeto -->
+            <div class="unity-card" style="margin-bottom: 2rem;">
+                <h3 style="color: var(--gray-800); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem;">
+                    <i class="fas fa-tasks" style="color: var(--tech-blue);"></i> Status do Projeto
+                </h3>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--gray-50); border-radius: 8px; border-left: 4px solid var(--secondary-green);">
+                        <i class="fas fa-server" style="color: var(--secondary-green); font-size: 1.5rem;"></i>
+                        <div>
+                            <div style="font-weight: 600; color: var(--gray-800);">Backend</div>
+                            <div style="font-size: 0.9rem; color: var(--secondary-green);">✅ Concluído</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--gray-50); border-radius: 8px; border-left: 4px solid var(--secondary-green);">
+                        <i class="fas fa-desktop" style="color: var(--secondary-green); font-size: 1.5rem;"></i>
+                        <div>
+                            <div style="font-weight: 600; color: var(--gray-800);">Frontend</div>
+                            <div style="font-size: 0.9rem; color: var(--secondary-green);">✅ Concluído</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--gray-50); border-radius: 8px; border-left: 4px solid var(--orange);">
+                        <i class="fas fa-cog" style="color: var(--orange); font-size: 1.5rem;"></i>
+                        <div>
+                            <div style="font-weight: 600; color: var(--gray-800);">Simulação</div>
+                            <div style="font-size: 0.9rem; color: var(--orange);">🔧 Desenvolvimento</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--gray-50); border-radius: 8px; border-left: 4px solid var(--amber);">
+                        <i class="fas fa-medal" style="color: var(--amber); font-size: 1.5rem;"></i>
+                        <div>
+                            <div style="font-weight: 600; color: var(--gray-800);">Premiação</div>
+                            <div style="font-size: 0.9rem; color: var(--amber);">🕒 Aguardando...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dados do Usuário Atual -->
+            <div class="unity-card">
+                <h3 style="color: var(--gray-800); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem;">
+                    <i class="fas fa-user" style="color: var(--purple);"></i> Seu Perfil Unity
+                </h3>
+                
+                <!-- Métricas Unity -->
+                <div class="unity-metrics" style="margin-bottom: 1.5rem;">
+                    <div class="unity-metric-card" style="border-left-color: var(--primary-green);">
+                        <div class="unity-metric-value" style="color: var(--primary-green);">${Number(soilParams.ph || 0).toFixed(1)}</div>
+                        <div class="unity-metric-label">pH do Solo</div>
+                        <div class="unity-metric-status" style="color: ${Number(soilParams.ph || 0) >= 6.0 && Number(soilParams.ph || 0) <= 7.0 ? 'var(--primary-green)' : 'var(--orange)'};">
+                            ${Number(soilParams.ph || 0) >= 6.0 && Number(soilParams.ph || 0) <= 7.0 ? '✓ Ideal' : '⚠ Atenção'}
+                        </div>
+                    </div>
+                    
+                    <div class="unity-metric-card" style="border-left-color: var(--tech-blue);">
+                        <div class="unity-metric-value" style="color: var(--tech-blue);">${Number(soilParams.umidade || 0).toFixed(0)}%</div>
+                        <div class="unity-metric-label">Umidade</div>
+                        <div class="unity-metric-status" style="color: ${Number(soilParams.umidade || 0) >= 40 && Number(soilParams.umidade || 0) <= 70 ? 'var(--primary-green)' : 'var(--orange)'};">
+                            ${Number(soilParams.umidade || 0) >= 40 && Number(soilParams.umidade || 0) <= 70 ? '✓ Ideal' : '⚠ Atenção'}
+                        </div>
+                    </div>
+                    
+                    <div class="unity-metric-card" style="border-left-color: var(--orange);">
+                        <div class="unity-metric-value" style="color: var(--orange);">${Number(soilParams.temperatura || 0).toFixed(0)}°C</div>
+                        <div class="unity-metric-label">Temperatura</div>
+                        <div class="unity-metric-status" style="color: ${Number(soilParams.temperatura || 0) >= 20 && Number(soilParams.temperatura || 0) <= 30 ? 'var(--primary-green)' : 'var(--orange)'};">
+                            ${Number(soilParams.temperatura || 0) >= 20 && Number(soilParams.temperatura || 0) <= 30 ? '✓ Ideal' : '⚠ Atenção'}
+                        </div>
+                    </div>
+                    
+                    <div class="unity-metric-card" style="border-left-color: var(--purple);">
+                        <div class="unity-metric-value" style="color: var(--purple);">${gameMetrics.score || 0}</div>
+                        <div class="unity-metric-label">Score Unity</div>
+                        <div class="unity-metric-status" style="color: var(--gray-500);">Última sessão</div>
+                    </div>
+                </div>
+                
+                <!-- Cards Unity -->
+                <div class="unity-info-grid">
+                    <!-- Perfil Unity -->
+                    <div class="unity-card" style="background: var(--gray-50);">
+                        <div class="unity-card-header">
+                            <div class="unity-card-icon">
+                                <i class="fas fa-gamepad"></i>
+                            </div>
+                            <div>
+                                <h3 class="unity-card-title">${profile.dados_pessoais?.nome || 'Jogador Unity'}</h3>
+                                <p class="unity-card-subtitle">
+                                    <i class="fas fa-tractor" style="color: var(--primary-green);"></i>
+                                    ${dashboardData.propriedade || 'Fazenda Unity'}
+                                </p>
+                            </div>
+                        </div>
+                        
                         <div>
                             <div class="unity-data-row">
                                 <i class="fas fa-id-card"></i>
@@ -172,41 +341,28 @@ const UnityDashboard = {
                                 <span><strong>Email:</strong> ${profile.dados_pessoais?.email || 'N/A'}</span>
                             </div>
                             <div class="unity-data-row">
-                                <i class="fas fa-phone"></i>
-                                <span><strong>Telefone:</strong> ${profile.dados_pessoais?.telefone || 'N/A'}</span>
-                            </div>
-                            <div class="unity-data-row">
                                 <i class="fas fa-expand-arrows-alt"></i>
                                 <span><strong>Área:</strong> ${dashboardData.area || 0} ha</span>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Gaming Stats -->
-                <div class="unity-card">
-                    <div class="unity-card-header">
-                        <div class="unity-card-icon" style="background: linear-gradient(135deg, var(--unity-primary), var(--unity-secondary));">
-                            <i class="fas fa-trophy"></i>
-                        </div>
-                        <div>
-                            <h3 class="unity-card-title">Stats de Jogo</h3>
-                            <p class="unity-card-subtitle">Performance Unity</p>
-                        </div>
-                    </div>
                     
-                    <div>
-                        <h4 style="color: var(--gray-800); margin-bottom: 1rem; font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-chart-bar" style="color: var(--unity-primary);"></i> Ações do Jogador
-                        </h4>
+                    <!-- Gaming Stats -->
+                    <div class="unity-card" style="background: var(--gray-50);">
+                        <div class="unity-card-header">
+                            <div class="unity-card-icon" style="background: linear-gradient(135deg, var(--unity-primary), var(--unity-secondary));">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div>
+                                <h3 class="unity-card-title">Performance Unity</h3>
+                                <p class="unity-card-subtitle">Última sessão</p>
+                            </div>
+                        </div>
+                        
                         <div>
                             <div class="unity-data-row">
                                 <i class="fas fa-tint"></i>
                                 <span><strong>Irrigação:</strong> ${playerActions.irrigacao || 0}%</span>
-                            </div>
-                            <div class="unity-data-row">
-                                <i class="fas fa-seedling"></i>
-                                <span><strong>NPK Aplicado:</strong> N:${playerActions.fertilizante_npk?.N || 0} P:${playerActions.fertilizante_npk?.P || 0} K:${playerActions.fertilizante_npk?.K || 0}</span>
                             </div>
                             <div class="unity-data-row">
                                 <i class="fas fa-coins"></i>
@@ -225,6 +381,13 @@ const UnityDashboard = {
 
     // Profile Content
     loadProfileContent(data) {
+        // Atualizar saudação do perfil
+        const profileGreeting = document.getElementById('profile-greeting');
+        if (profileGreeting && data.profile?.dados_pessoais?.nome) {
+            const primeiroNome = data.profile.dados_pessoais.nome.split(' ')[0];
+            profileGreeting.textContent = `Olá, ${primeiroNome}!`;
+        }
+        
         const profile = data.profile || {};
         const pessoais = profile.dados_pessoais || {};
         const propriedade = profile.propriedade || {};
@@ -605,7 +768,7 @@ const UnityDashboard = {
             <!-- Controles do Mapa -->
             <div class="unity-card" style="margin-bottom: 2rem;">
                 <h3 style="color: var(--primary-green); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="fas fa-sliders-h"></i> Controles do Mapa Unity
+                    <i class="fas fa-sliders-h"></i> Controles do Mapa
                 </h3>
                 <div class="unity-info-grid" style="grid-template-columns: 1fr 1fr;">
                     <div style="background: rgba(255,255,255,0.8); padding: 1.5rem; border-radius: 16px; border: 1px solid var(--gray-200);">
@@ -713,151 +876,95 @@ const UnityDashboard = {
         const acoesPrioritarias = diagnostico.acoes_prioritarias || [];
         
         document.getElementById('ai-content').innerHTML = `
-            <!-- Header IA Avançada -->
-            <div class="unity-card" style="background: linear-gradient(135deg, var(--primary-green), var(--secondary-green)); color: white; margin-bottom: 2rem;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
-                    <h2 style="color: white; margin: 0; display: flex; align-items: center; gap: 0.75rem; font-size: 1.5rem;">
-                        <i class="fas fa-robot"></i> EKKO IA - Análise Avançada
-                    </h2>
-                    <div style="background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600;">
-                        🌾 ${data.cultivo_principal || 'Cultivo Geral'}
+            <!-- Análise IA -->
+            <div class="unity-card" style="margin-bottom: 2rem; background: linear-gradient(135deg, var(--gray-50), var(--white)); border-left: 4px solid var(--purple);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+                    <div>
+                        <h2 style="color: var(--gray-800); margin: 0; display: flex; align-items: center; gap: 0.75rem; font-size: 1.6rem;">
+                            <i class="fas fa-robot" style="color: var(--purple);"></i> Análise Inteligente do Solo
+                        </h2>
+                        <p style="color: var(--gray-600); margin: 0.5rem 0 0 0; font-size: 1rem;">Diagnóstico completo baseado em IA</p>
+                    </div>
+                    <div style="background: var(--white); padding: 0.75rem 1.5rem; border-radius: 12px; border: 1px solid var(--gray-200); box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-seedling" style="color: var(--secondary-green);"></i>
+                            <span style="font-weight: 600; color: var(--gray-800);">${data.cultivo_principal || 'Cultivo Geral'}</span>
+                        </div>
                     </div>
                 </div>
                 
                 <!-- Métricas Principais -->
-                <div class="unity-info-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                    <div style="text-align: center; padding: 1.5rem; background: rgba(255,255,255,0.15); border-radius: 12px; backdrop-filter: blur(10px);">
-                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem; font-weight: 700;">${Math.round(diagnostico.saude_geral || 0)}%</div>
-                        <div style="font-weight: 600; opacity: 0.9;">Saúde Geral</div>
-                        <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 0.25rem;">${this.getHealthStatus(diagnostico.saude_geral)}</div>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;">
+                    <div style="text-align: center; padding: 1.5rem; background: var(--white); border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--gray-200);">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem; font-weight: 700; color: var(--secondary-green);">${Math.round(diagnostico.saude_geral || 0)}%</div>
+                        <div style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">Saúde Geral</div>
+                        <div style="font-size: 0.8rem; color: var(--gray-500); margin-top: 0.25rem;">${this.getHealthStatus(diagnostico.saude_geral)}</div>
                     </div>
-                    <div style="text-align: center; padding: 1.5rem; background: rgba(255,255,255,0.15); border-radius: 12px; backdrop-filter: blur(10px);">
-                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem; font-weight: 700;">${resumo.parametros_ideais || 0}/${resumo.total_parametros || 0}</div>
-                        <div style="font-weight: 600; opacity: 0.9;">Parâmetros Ideais</div>
-                        <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 0.25rem;">${Math.round(((resumo.parametros_ideais || 0) / (resumo.total_parametros || 1)) * 100)}% otimizado</div>
+                    <div style="text-align: center; padding: 1.5rem; background: var(--white); border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--gray-200);">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem; font-weight: 700; color: var(--tech-blue);">${resumo.parametros_ideais || 0}/${resumo.total_parametros || 0}</div>
+                        <div style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">Parâmetros Ideais</div>
+                        <div style="font-size: 0.8rem; color: var(--gray-500); margin-top: 0.25rem;">${Math.round(((resumo.parametros_ideais || 0) / (resumo.total_parametros || 1)) * 100)}% otimizado</div>
                     </div>
-                    <div style="text-align: center; padding: 1.5rem; background: rgba(255,255,255,0.15); border-radius: 12px; backdrop-filter: blur(10px);">
-                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem; font-weight: 700;">${(diagnostico.alertas_criticos || []).length}</div>
-                        <div style="font-weight: 600; opacity: 0.9;">Alertas Críticos</div>
-                        <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 0.25rem;">${(diagnostico.alertas_criticos || []).length === 0 ? 'Tudo OK' : 'Atenção'}</div>
+                    <div style="text-align: center; padding: 1.5rem; background: var(--white); border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--gray-200);">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem; font-weight: 700; color: ${(diagnostico.alertas_criticos || []).length === 0 ? 'var(--secondary-green)' : 'var(--orange)'};">${(diagnostico.alertas_criticos || []).length}</div>
+                        <div style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">Alertas Críticos</div>
+                        <div style="font-size: 0.8rem; color: var(--gray-500); margin-top: 0.25rem;">${(diagnostico.alertas_criticos || []).length === 0 ? 'Tudo OK' : 'Atenção'}</div>
                     </div>
-                    <div style="text-align: center; padding: 1.5rem; background: rgba(255,255,255,0.15); border-radius: 12px; backdrop-filter: blur(10px);">
-                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem; font-weight: 700;">${resumo.nivel_sustentabilidade || 0}%</div>
-                        <div style="font-weight: 600; opacity: 0.9;">Sustentabilidade</div>
-                        <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 0.25rem;">🌱 ${this.getSustainabilityLevel(resumo.nivel_sustentabilidade)}</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Insights e Previsões -->
-            <div class="unity-info-grid" style="margin-bottom: 2rem;">
-                <!-- Previsão de Colheita -->
-                <div class="unity-card" style="border-left: 4px solid var(--amber);">
-                    <h3 style="color: var(--amber); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-chart-line"></i> Previsão de Colheita
-                    </h3>
-                    <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05)); padding: 1.5rem; border-radius: 12px; text-align: center;">
-                        <div style="font-size: 1.2rem; font-weight: 600; color: var(--gray-800); margin-bottom: 0.5rem;">
-                            ${diagnostico.previsao_colheita || 'Calculando...'}
-                        </div>
-                        <div style="font-size: 0.9rem; color: var(--gray-600);">Baseado na saúde atual do solo</div>
-                    </div>
-                </div>
-                
-                <!-- Análise Econômica -->
-                <div class="unity-card" style="border-left: 4px solid var(--tech-blue);">
-                    <h3 style="color: var(--tech-blue); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-coins"></i> Análise Econômica
-                    </h3>
-                    <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05)); padding: 1.5rem; border-radius: 12px; text-align: center;">
-                        <div style="font-size: 1.2rem; font-weight: 600; color: var(--gray-800); margin-bottom: 0.5rem;">
-                            ${diagnostico.economia_estimada || 'Analisando...'}
-                        </div>
-                        <div style="font-size: 0.9rem; color: var(--gray-600);">Impacto financeiro estimado</div>
+                    <div style="text-align: center; padding: 1.5rem; background: var(--white); border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--gray-200);">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem; font-weight: 700; color: var(--purple);">${resumo.nivel_sustentabilidade || 0}%</div>
+                        <div style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">Sustentabilidade</div>
+                        <div style="font-size: 0.8rem; color: var(--gray-500); margin-top: 0.25rem;">${this.getSustainabilityLevel(resumo.nivel_sustentabilidade)}</div>
                     </div>
                 </div>
             </div>
             
-            <!-- Ações Prioritárias -->
-            ${acoesPrioritarias.length > 0 ? `
-                <div class="unity-card" style="border-left: 4px solid var(--orange); margin-bottom: 2rem;">
-                    <h3 style="color: var(--orange); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-exclamation-triangle"></i> Ações Prioritárias
-                    </h3>
-                    <div style="background: rgba(249, 115, 22, 0.1); padding: 1.5rem; border-radius: 12px;">
-                        ${acoesPrioritarias.map(acao => `
-                            <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: white; border-radius: 8px; margin-bottom: 0.75rem; border-left: 3px solid var(--orange);">
-                                <div style="font-size: 1.1rem;">${acao.includes('🚨') ? '🚨' : '⚡'}</div>
-                                <div style="color: var(--gray-800); font-weight: 500;">${acao.replace('🚨 ', '').replace('⚡ ', '')}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            ` : ''}
-            
-            <!-- Tendência e Recomendação Geral -->
-            <div class="unity-info-grid" style="margin-bottom: 2rem;">
-                <div class="unity-card" style="border-left: 4px solid var(--purple);">
-                    <h3 style="color: var(--purple); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-trending-up"></i> Tendência
-                    </h3>
-                    <div style="text-align: center; padding: 1.5rem; background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(139, 92, 246, 0.05)); border-radius: 12px;">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">${this.getTrendIcon(resumo.tendencia_geral)}</div>
-                        <div style="font-size: 1.2rem; font-weight: 600; color: var(--gray-800);">${resumo.tendencia_geral || 'Estável'}</div>
-                        <div style="font-size: 0.9rem; color: var(--gray-600); margin-top: 0.5rem;">Últimas 3 sessões</div>
-                    </div>
-                </div>
-                
-                <div class="unity-card" style="border-left: 4px solid var(--secondary-green);">
-                    <h3 style="color: var(--secondary-green); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-lightbulb"></i> Recomendação IA
-                    </h3>
-                    <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05)); padding: 1.5rem; border-radius: 12px;">
-                        <p style="color: var(--gray-800); font-weight: 500; margin: 0; line-height: 1.6;">
-                            ${diagnostico.recomendacao_geral || 'Continue monitorando os parâmetros do solo'}
-                        </p>
-                    </div>
-                </div>
-            </div>
+
             
             <!-- Análise Detalhada por Parâmetro -->
-            <div class="unity-card" style="margin-bottom: 2rem;">
-                <h3 style="color: var(--gray-800); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="fas fa-microscope"></i> Análise Detalhada dos Parâmetros
+            <div class="unity-card">
+                <h3 style="color: var(--gray-800); margin-bottom: 2rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.4rem;">
+                    <i class="fas fa-microscope" style="color: var(--purple);"></i> Análise Detalhada dos Parâmetros
                 </h3>
-                <div class="unity-info-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;">
                     ${Object.entries(parametros).map(([param, data]) => `
-                        <div class="unity-card" style="border-left: 4px solid ${this.getStatusColor(data.status)}; background: ${this.getStatusBg(data.status)};">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-                                <h4 style="color: ${this.getStatusColor(data.status)}; margin: 0; display: flex; align-items: center; gap: 0.5rem; font-size: 1.1rem;">
-                                    <i class="fas fa-${this.getParametroIcon(param)}"></i> ${this.getParametroNome(param)}
-                                </h4>
-                                <div style="padding: 0.25rem 0.75rem; border-radius: 12px; background: ${this.getStatusColor(data.status)}; color: white; font-size: 0.75rem; font-weight: 600;">
+                        <div style="background: var(--white); border: 1px solid var(--gray-200); border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 4px solid ${this.getStatusColor(data.status)};">
+                            <!-- Header do Parâmetro -->
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <div style="background: ${this.getStatusColor(data.status)}; color: white; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-${this.getParametroIcon(param)}" style="font-size: 1.2rem;"></i>
+                                    </div>
+                                    <h4 style="color: var(--gray-800); margin: 0; font-size: 1.1rem; font-weight: 600;">${this.getParametroNome(param)}</h4>
+                                </div>
+                                <div style="padding: 0.5rem 1rem; border-radius: 20px; background: ${this.getStatusColor(data.status)}; color: white; font-size: 0.8rem; font-weight: 600;">
                                     ${this.getStatusTexto(data.status)}
                                 </div>
                             </div>
                             
-                            <div style="text-align: center; margin-bottom: 1.5rem;">
-                                <div style="font-size: 2.2rem; font-weight: 700; color: ${this.getStatusColor(data.status)}; margin-bottom: 0.25rem;">
+                            <!-- Valor Principal -->
+                            <div style="text-align: center; margin-bottom: 1.5rem; padding: 1rem; background: var(--gray-50); border-radius: 8px;">
+                                <div style="font-size: 2.5rem; font-weight: 700; color: ${this.getStatusColor(data.status)}; margin-bottom: 0.5rem;">
                                     ${data.valor}${this.getParametroUnidade(param)}
                                 </div>
-                                <div style="font-size: 0.9rem; color: var(--gray-600); background: rgba(255,255,255,0.8); padding: 0.25rem 0.75rem; border-radius: 12px; display: inline-block;">
-                                    Ideal: ${data.faixa_ideal}
+                                <div style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">
+                                    Faixa Ideal: ${data.faixa_ideal}
                                 </div>
                             </div>
                             
-                            <div style="background: rgba(255,255,255,0.9); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                                <h5 style="color: var(--gray-800); margin-bottom: 0.5rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
-                                    <i class="fas fa-info-circle" style="color: ${this.getStatusColor(data.status)};"></i> Impacto:
+                            <!-- Impacto -->
+                            <div style="margin-bottom: 1.5rem;">
+                                <h5 style="color: var(--gray-800); margin-bottom: 0.75rem; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
+                                    <i class="fas fa-info-circle" style="color: ${this.getStatusColor(data.status)};"></i> Impacto no Solo
                                 </h5>
-                                <p style="color: var(--gray-700); font-size: 0.85rem; margin: 0; line-height: 1.4;">${data.impacto}</p>
+                                <p style="color: var(--gray-700); font-size: 0.9rem; margin: 0; line-height: 1.5; padding: 1rem; background: var(--white); border: 1px solid var(--gray-200); border-radius: 8px;">${data.impacto}</p>
                             </div>
                             
-                            <div style="background: linear-gradient(135deg, ${this.getStatusColor(data.status)}, ${this.getStatusColorDark(data.status)}); padding: 1rem; border-radius: 8px; color: white;">
-                                <h5 style="margin-bottom: 0.5rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
-                                    <i class="fas fa-lightbulb"></i> Ação Recomendada:
+                            <!-- Recomendação -->
+                            <div style="background: linear-gradient(135deg, ${this.getStatusColor(data.status)}, ${this.getStatusColorDark(data.status)}); padding: 1.25rem; border-radius: 8px; color: white;">
+                                <h5 style="margin-bottom: 0.75rem; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
+                                    <i class="fas fa-lightbulb"></i> Ação Recomendada
                                 </h5>
-                                <p style="font-size: 0.85rem; margin: 0; line-height: 1.4; font-weight: 500;">${data.sugestao}</p>
+                                <p style="font-size: 0.9rem; margin: 0; line-height: 1.5; font-weight: 500;">${data.sugestao}</p>
                             </div>
                         </div>
                     `).join('')}
@@ -1092,6 +1199,7 @@ const UnityDashboard = {
             'fosforo': 'Fósforo (P)',
             'potassio': 'Potássio (K)',
             'condutividade': 'Condutividade',
+            'materia_organica': 'Matéria Orgânica',
             'performance': 'Performance Unity'
         };
         return nomes[param] || param.toUpperCase();
@@ -1245,15 +1353,16 @@ const UnityDashboard = {
             'ai': 'IA & Solo',
             'heatmap': 'Estatísticas',
             'readings': 'Unity',
+            'development': 'Desenvolvimento',
             'monitoring': 'Monitoramento Real Time'
         };
         
         if (titles[sectionId]) {
             document.getElementById('page-title').textContent = titles[sectionId];
             if (sectionId === 'dashboard') {
-                document.getElementById('breadcrumb').textContent = 'Início';
+                document.getElementById('breadcrumb').textContent = 'Dashboard';
             } else {
-                document.getElementById('breadcrumb').textContent = `Início > ${titles[sectionId]}`;
+                document.getElementById('breadcrumb').textContent = `Dashboard > ${titles[sectionId]}`;
             }
         }
     },
@@ -1263,8 +1372,11 @@ const UnityDashboard = {
         document.getElementById('nav-ai').style.display = 'block';
         document.getElementById('nav-heatmap').style.display = 'block';
         document.getElementById('nav-readings').style.display = 'block';
+        document.getElementById('nav-development').style.display = 'block';
         document.getElementById('nav-monitoring').style.display = 'block';
     },
+
+
 
     showMessage(text, type = 'success', duration = 5000) {
         const messageDiv = document.getElementById("mensagem");
@@ -1309,10 +1421,7 @@ const UnityDashboard = {
         const timelineCanvas = document.getElementById('unityTimelineChart');
         const heatmapCanvas = document.getElementById('unityHeatmapChart');
         
-        console.log('Inicializando gráficos...', {timelineCanvas, heatmapCanvas});
-        
         if (!timelineCanvas || !heatmapCanvas) {
-            console.error('Canvas não encontrados');
             return;
         }
         
@@ -1344,8 +1453,6 @@ const UnityDashboard = {
         
         // Criar mapa de calor real usando canvas
         this.createHeatmapCanvas(heatmapCanvas);
-        
-        console.log('Gráficos criados com sucesso');
     },
     
     // Atualizar visualização dos mapas
@@ -1355,7 +1462,6 @@ const UnityDashboard = {
         const parametro = document.getElementById('unity-heatmap-parameter')?.value || 'ph';
         const periodo = document.getElementById('unity-heatmap-period')?.value || 'latest';
         
-        // Atualizar títulos
         const titulos = {
             'ph': 'pH do Solo',
             'umidade': 'Umidade',
@@ -1402,7 +1508,6 @@ const UnityDashboard = {
             }
         }
         
-        // Processar dados
         const dadosTimeline = [];
         const dadosHeatmap = [];
         const cultivoData = {};
@@ -1530,6 +1635,187 @@ const UnityDashboard = {
         return cor;
     },
     
+    // Development Content
+    loadDevelopmentContent(data) {
+        document.getElementById('development-content').innerHTML = `
+            <!-- Stack Tecnológico -->
+            <div class="unity-card" style="margin-bottom: 2rem; background: linear-gradient(135deg, var(--gray-50), var(--white)); border-left: 4px solid var(--tech-blue);">
+                <h3 style="color: var(--tech-blue); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.4rem;">
+                    <i class="fas fa-layer-group"></i> Stack Tecnológico
+                </h3>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;">
+                    <div style="text-align: center; padding: 1.5rem; background: var(--white); border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--gray-200);">
+                        <div style="background: linear-gradient(135deg, #3776ab, #4b8bbe); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <i class="fab fa-python" style="font-size: 1.8rem;"></i>
+                        </div>
+                        <h4 style="color: var(--gray-800); margin-bottom: 0.5rem;">Python</h4>
+                        <p style="color: var(--gray-600); font-size: 0.9rem;">FastAPI + PyMongo</p>
+                    </div>
+                    <div style="text-align: center; padding: 1.5rem; background: var(--white); border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--gray-200);">
+                        <div style="background: linear-gradient(135deg, #f7df1e, #f0db4f); color: #323330; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <i class="fab fa-js-square" style="font-size: 1.8rem;"></i>
+                        </div>
+                        <h4 style="color: var(--gray-800); margin-bottom: 0.5rem;">JavaScript</h4>
+                        <p style="color: var(--gray-600); font-size: 0.9rem;">Vanilla + Chart.js</p>
+                    </div>
+                    <div style="text-align: center; padding: 1.5rem; background: var(--white); border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--gray-200);">
+                        <div style="background: linear-gradient(135deg, #47a248, #4db33d); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <i class="fas fa-leaf" style="font-size: 1.8rem;"></i>
+                        </div>
+                        <h4 style="color: var(--gray-800); margin-bottom: 0.5rem;">MongoDB</h4>
+                        <p style="color: var(--gray-600); font-size: 0.9rem;">Atlas Cloud</p>
+                    </div>
+                    <div style="text-align: center; padding: 1.5rem; background: var(--white); border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--gray-200);">
+                        <div style="background: linear-gradient(135deg, #000000, #333333); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <i class="fab fa-unity" style="font-size: 1.8rem;"></i>
+                        </div>
+                        <h4 style="color: var(--gray-800); margin-bottom: 0.5rem;">Unity</h4>
+                        <p style="color: var(--gray-600); font-size: 0.9rem;">Game Engine</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Arquitetura do Sistema -->
+            <div class="unity-info-grid" style="margin-bottom: 2rem;">
+                <!-- Backend -->
+                <div class="unity-card" style="border-left: 4px solid var(--secondary-green);">
+                    <h3 style="color: var(--secondary-green); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-server"></i> Backend Development
+                    </h3>
+                    <div>
+                        <div class="unity-data-row">
+                            <i class="fas fa-rocket"></i>
+                            <span><strong>FastAPI:</strong> Framework web moderno e rápido</span>
+                        </div>
+                        <div class="unity-data-row">
+                            <i class="fas fa-database"></i>
+                            <span><strong>MongoDB Atlas:</strong> Banco NoSQL na nuvem</span>
+                        </div>
+                        <div class="unity-data-row">
+                            <i class="fas fa-shield-alt"></i>
+                            <span><strong>Autenticação:</strong> Sistema Unity ID</span>
+                        </div>
+                        <div class="unity-data-row">
+                            <i class="fas fa-brain"></i>
+                            <span><strong>IA:</strong> Análise de solo inteligente</span>
+                        </div>
+                        <div class="unity-data-row">
+                            <i class="fas fa-plug"></i>
+                            <span><strong>Endpoints:</strong> 8 rotas REST</span>
+                        </div>
+                        <div class="unity-data-row">
+                            <i class="fas fa-satellite"></i>
+                            <span><strong>Postman:</strong> Testes de API</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Frontend -->
+                <div class="unity-card" style="border-left: 4px solid var(--tech-blue);">
+                    <h3 style="color: var(--tech-blue); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-desktop"></i> Frontend Development
+                    </h3>
+                    <div>
+                        <div class="unity-data-row">
+                            <i class="fab fa-html5"></i>
+                            <span><strong>HTML5:</strong> Estrutura semântica moderna</span>
+                        </div>
+                        <div class="unity-data-row">
+                            <i class="fab fa-css3-alt"></i>
+                            <span><strong>CSS3:</strong> Design responsivo + glassmorphism</span>
+                        </div>
+                        <div class="unity-data-row">
+                            <i class="fab fa-js-square"></i>
+                            <span><strong>JavaScript:</strong> Vanilla ES6+ modular</span>
+                        </div>
+                        <div class="unity-data-row">
+                            <i class="fas fa-chart-bar"></i>
+                            <span><strong>Chart.js:</strong> Visualizações interativas</span>
+                        </div>
+                        <div class="unity-data-row">
+                            <i class="fas fa-mobile-alt"></i>
+                            <span><strong>Responsivo:</strong> Desktop, tablet, mobile</span>
+                        </div>
+                        <div class="unity-data-row">
+                            <i class="fas fa-icons"></i>
+                            <span><strong>Font Awesome:</strong> Biblioteca de ícones</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- API Endpoints -->
+            <div class="unity-card" style="margin-bottom: 2rem;">
+                <h3 style="color: var(--purple); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-code"></i> API Endpoints
+                </h3>
+                <div style="background: var(--gray-900); color: var(--gray-100); padding: 1.5rem; border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; overflow-x: auto;">
+                    <div style="margin-bottom: 1rem; color: var(--secondary-green);">// Principais endpoints da API</div>
+                    <div style="margin-bottom: 0.5rem;"><span style="color: var(--tech-blue);">GET</span> <span style="color: var(--amber);">/unity/status</span> <span style="color: var(--gray-400);">// Status da API</span></div>
+                    <div style="margin-bottom: 0.5rem;"><span style="color: var(--tech-blue);">GET</span> <span style="color: var(--amber);">/unity/login/{unity_id}</span> <span style="color: var(--gray-400);">// Login Unity</span></div>
+                    <div style="margin-bottom: 0.5rem;"><span style="color: var(--secondary-green);">POST</span> <span style="color: var(--amber);">/unity/soil/save/{unity_id}</span> <span style="color: var(--gray-400);">// Salvar dados</span></div>
+                    <div style="margin-bottom: 0.5rem;"><span style="color: var(--tech-blue);">GET</span> <span style="color: var(--amber);">/unity/dashboard/{unity_id}</span> <span style="color: var(--gray-400);">// Dashboard</span></div>
+                    <div style="margin-bottom: 0.5rem;"><span style="color: var(--tech-blue);">GET</span> <span style="color: var(--amber);">/unity/analise-ia/{unity_id}</span> <span style="color: var(--gray-400);">// Análise IA</span></div>
+                </div>
+            </div>
+            
+            <!-- Métricas de Desenvolvimento -->
+            <div class="unity-card">
+                <h3 style="color: var(--orange); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-chart-line"></i> Métricas de Desenvolvimento
+                </h3>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;">
+                    <div style="text-align: center; padding: 1.5rem; background: var(--gray-50); border-radius: 12px; border: 2px solid var(--secondary-green);">
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--secondary-green); margin-bottom: 0.5rem;">2.5k+</div>
+                        <div style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">Linhas de Código</div>
+                    </div>
+                    <div style="text-align: center; padding: 1.5rem; background: var(--gray-50); border-radius: 12px; border: 2px solid var(--tech-blue);">
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--tech-blue); margin-bottom: 0.5rem;">15+</div>
+                        <div style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">Arquivos JS/CSS</div>
+                    </div>
+                    <div style="text-align: center; padding: 1.5rem; background: var(--gray-50); border-radius: 12px; border: 2px solid var(--purple);">
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--purple); margin-bottom: 0.5rem;">3</div>
+                        <div style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">Coleções no Banco de Dados</div>
+                    </div>
+                    <div style="text-align: center; padding: 1.5rem; background: var(--gray-50); border-radius: 12px; border: 2px solid var(--orange);">
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--orange); margin-bottom: 0.5rem;">3</div>
+                        <div style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">Meses de Desenvolvimento</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Serviços AWS -->
+            <div class="unity-card" style="margin-top: 2rem;">
+                <h3 style="color: var(--secondary-green); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fab fa-aws" style="color: var(--orange);"></i> Serviços AWS Utilizados
+                </h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+                    <div style="text-align: center; padding: 1.5rem; background: linear-gradient(135deg, rgba(255,153,0,0.1), rgba(255,153,0,0.05)); border-radius: 12px; border: 2px solid rgba(255,153,0,0.2);">
+                        <div style="background: linear-gradient(135deg, #FF9900, #FF6600); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <i class="fas fa-robot" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <h4 style="color: var(--gray-800); margin-bottom: 0.5rem;">Amazon Q Developer</h4>
+                        <p style="color: var(--gray-600); font-size: 0.9rem;">Agente de código IA</p>
+                    </div>
+                    <div style="text-align: center; padding: 1.5rem; background: linear-gradient(135deg, rgba(255,153,0,0.1), rgba(255,153,0,0.05)); border-radius: 12px; border: 2px solid rgba(255,153,0,0.2);">
+                        <div style="background: linear-gradient(135deg, #FF9900, #FF6600); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <i class="fas fa-cloud" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <h4 style="color: var(--gray-800); margin-bottom: 0.5rem;">Cloud Ready</h4>
+                        <p style="color: var(--gray-600); font-size: 0.9rem;">Arquitetura preparada</p>
+                    </div>
+                    <div style="text-align: center; padding: 1.5rem; background: linear-gradient(135deg, rgba(255,153,0,0.1), rgba(255,153,0,0.05)); border-radius: 12px; border: 2px solid rgba(255,153,0,0.2);">
+                        <div style="background: linear-gradient(135deg, #FF9900, #FF6600); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <i class="fas fa-rocket" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <h4 style="color: var(--gray-800); margin-bottom: 0.5rem;">Escalabilidade</h4>
+                        <p style="color: var(--gray-600); font-size: 0.9rem;">Deploy otimizado</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
     // Monitoramento Real Time Content
     loadMonitoringContent(data) {
         document.getElementById('monitoring-content').innerHTML = `
@@ -1575,7 +1861,6 @@ const UnityDashboard = {
         const width = canvas.width = 400;
         const height = canvas.height = 300;
         
-        // Organizar dados em matriz
         const cultivos = [...new Set(dados.map(d => d.cultivo))];
         const estacoes = ['Plantio', 'Crescimento', 'Floração', 'Colheita'];
         
@@ -1585,7 +1870,6 @@ const UnityDashboard = {
         // Limpar canvas
         ctx.clearRect(0, 0, width, height);
         
-        // Desenhar células do heatmap
         estacoes.forEach((estacao, i) => {
             cultivos.forEach((cultivo, j) => {
                 const dadosCelula = dados.filter(d => d.cultivo === cultivo && d.estacao === estacao);
