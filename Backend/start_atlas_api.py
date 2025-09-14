@@ -17,9 +17,15 @@ from dotenv import load_dotenv
 # Carregar .env
 load_dotenv()
 
-# MongoDB Atlas
-MONGO_URI = os.getenv("UNITY_MONGO_URI", "mongodb+srv://valentimthaiza:Lildashboard13_@projekko.jaiz3jf.mongodb.net/")
+# MongoDB Atlas - Configuração via variáveis de ambiente
+MONGO_URI = os.getenv("UNITY_MONGO_URI")
 DB_NAME = os.getenv("UNITY_MONGO_DB_NAME", "EKKOnUnity")
+API_HOST = os.getenv("API_HOST", "0.0.0.0")
+API_PORT = int(os.getenv("API_PORT", "8002"))
+API_DEBUG = os.getenv("API_DEBUG", "False").lower() == "true"
+
+if not MONGO_URI:
+    raise ValueError("UNITY_MONGO_URI não configurada. Configure o arquivo .env")
 
 client = MongoClient(MONGO_URI)
 db = client[DB_NAME]
@@ -750,4 +756,4 @@ if __name__ == "__main__":
     print("Status: http://127.0.0.1:8002/unity/status")
     print("=" * 50)
     
-    uvicorn.run(app, host="0.0.0.0", port=8002)
+    uvicorn.run(app, host=API_HOST, port=API_PORT, debug=API_DEBUG)

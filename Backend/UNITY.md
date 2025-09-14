@@ -1,10 +1,10 @@
-# 🎮 UNITY - Especificações de Integração
+# 🎮 INTEGRAÇÃO UNITY - Especificações
 
-Dados que o Unity deve enviar para alimentar o sistema EKKO.
+Dados que a simulação da Unity deve enviar para alimentar o sistema EKKO.
 
 ## 🔗 Endpoint Principal
 
-**POST** `http://localhost:8002/unity/soil/save/{unity_id}`
+**POST** `http://localhost:8002/unity/soil/save/{user_id}`
 
 ## 📊 Dados Obrigatórios
 
@@ -53,7 +53,7 @@ Dados que o Unity deve enviar para alimentar o sistema EKKO.
 ```json
 {
   "session_id": "session_123",  // string: ID único da sessão
-  "unity_id": "unity_abc123"    // string: ID do jogador Unity
+  "user_id": "user_abc123"      // string: ID do usuário
 }
 ```
 
@@ -96,24 +96,24 @@ POST /unity/profile/create
   "telefone": "(35) 99999-0000",
   "cpf": "000.000.000-00",
   "propriedade": {
-    "nome": "Fazenda Unity",
+    "nome": "Fazenda EKKO",
     "area_hectares": 50.0,
     "localizacao": "Santa Rita do Sapucaí, MG",
     "cultivos_principais": ["Milho", "Soja"]
   }
 }
 ```
-**Retorna**: `unity_id` único
+**Retorna**: `user_id` único
 
 ### 2. **Durante o Jogo**
 A cada mudança significativa ou fim de sessão:
 ```http
-POST /unity/soil/save/{unity_id}
+POST /unity/soil/save/{user_id}
 [Dados do exemplo acima]
 ```
 
 ### 3. **Visualização no Dashboard**
-Jogador acessa: `http://localhost:3000/dashboard.html?unityId={unity_id}`
+Jogador acessa: `http://localhost:3000/dashboard.html?userId={user_id}`
 
 ## 🔍 Validações Automáticas
 

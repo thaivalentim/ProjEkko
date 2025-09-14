@@ -1,4 +1,4 @@
-# 📊 PROGRESSO - EKKO Unity Backend
+# 📊 PROGRESSO - Backend
 
 ## ✅ Concluído (100%)
 
@@ -28,7 +28,7 @@
 - [x] Fósforo (15-50 mg/kg)
 - [x] Potássio (100-250 mg/kg)
 - [x] Condutividade (< 1.5 dS/m)
-- [x] Performance Unity (> 800 pts)
+- [x] Performance Simulação (> 800 pts)
 
 ### 🗄️ **Banco de Dados**
 - [x] MongoDB Atlas conectado
@@ -37,7 +37,7 @@
 - [x] Dados de teste funcionais
 
 ### 🔐 **Autenticação**
-- [x] Login por Unity ID
+- [x] Login por ID do usuário
 - [x] Validação de usuários
 - [x] Sessões persistentes
 
@@ -53,11 +53,9 @@
 
 ## 🚀 Próximos Passos
 
-- [ ] Integração com Unity real
+- [ ] Integração completa com simulação Unity
 - [ ] Otimização de performance
-- [ ] Logs avançados
-- [ ] Backup automático
 - [ ] Monitoramento em tempo real
 
 ---
-**Status**: ✅ **PRODUÇÃO READY** | **Última atualização**: 8 de setembro de 2025
+**Status**: ✅ **85%** | **Última atualização**: 13 de setembro de 2025

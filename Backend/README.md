@@ -1,18 +1,18 @@
-# 🎮 EKKO Unity - Backend API
+# 🎮 EKKO - Backend API
 
-Sistema backend para integração com simulação Unity do projeto EKKO.
+Sistema backend para integração com simulação desenvolvida na Unity.
 
 ## 📁 Arquivos Essenciais
 
 ```
-EkkoUnity/
+Backend/
 ├── start_atlas_api.py     # API principal com MongoDB Atlas
 ├── requirements_unity.txt # Dependências Python
 ├── .env                   # Configurações (não commitado)
 ├── .env.example           # Exemplo de configurações
 ├── README.md              # Esta documentação
 ├── PROGRESSO.md           # Status do desenvolvimento
-└── UNITY.md               # Especificações para Unity
+└── UNITY.md               # Especificações para integração da simulação
 ```
 
 ## 🚀 Como Usar
@@ -26,6 +26,18 @@ pip install -r requirements_unity.txt
 ```bash
 cp .env.example .env
 # Editar .env com suas credenciais MongoDB Atlas
+```
+
+**Exemplo .env:**
+```env
+# MongoDB Atlas
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/
+MONGO_DB_NAME=EkkoDatabase
+
+# API Configuration
+API_HOST=0.0.0.0
+API_PORT=8002
+API_DEBUG=False
 ```
 
 ### 3. Executar API
@@ -43,10 +55,10 @@ python start_atlas_api.py
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
 | GET | `/unity/status` | Status da API e banco |
-| GET | `/unity/login/{unity_id}` | Login por Unity ID |
-| GET | `/unity/dashboard/{unity_id}` | Dados completos do dashboard |
-| POST | `/unity/soil/save/{unity_id}` | Salvar dados de solo do Unity |
-| GET | `/unity/analise-ia/{unity_id}` | Análise IA avançada (9 parâmetros) |
+| GET | `/unity/login/{user_id}` | Login por ID do usuário |
+| GET | `/unity/dashboard/{user_id}` | Dados completos do dashboard |
+| POST | `/unity/soil/save/{user_id}` | Salvar dados de solo da simulação |
+| GET | `/unity/analise-ia/{user_id}` | Análise IA avançada (9 parâmetros) |
 | GET | `/unity/recreate-test-data` | Recriar dados de teste |
 
 ## 🧠 Sistema IA
@@ -60,14 +72,14 @@ Analisa **9 parâmetros** em grade 3x3:
 6. **Fósforo (P)** - Nutriente primário
 7. **Potássio (K)** - Nutriente primário
 8. **Condutividade** - Condutividade elétrica
-9. **Performance Unity** - Score do jogo
+9. **Performance Simulação** - Score da simulação
 
 ## 🗄️ Banco de Dados
 
 - **MongoDB Atlas** - Nuvem
 - **Collections**:
   - `Python_userData` - Perfis de usuários
-  - `Unity_soilData` - Dados de solo do Unity
+  - `Unity_soilData` - Dados de solo da simulação
 
 ## 🔧 Tecnologias
 
@@ -76,7 +88,16 @@ Analisa **9 parâmetros** em grade 3x3:
 - **PyMongo** - Driver MongoDB
 - **MongoDB Atlas** - Banco NoSQL na nuvem
 - **Uvicorn** - Servidor ASGI
+- **python-dotenv** - Variáveis de ambiente
 - **Postman** - Testes de API
+
+## 🔒 Segurança
+
+- ✅ **Variáveis de Ambiente** - Credenciais não expostas no código
+- ✅ **Arquivo .env** - Não versionado no Git
+- ✅ **Template .env.example** - Guia de configuração
+- ✅ **Validação Obrigatória** - API não inicia sem configuração
+- ✅ **CORS Configurado** - Controle de acesso
 
 ## 📊 Métricas
 
@@ -84,7 +105,7 @@ Analisa **9 parâmetros** em grade 3x3:
 - **Coleções**: 3 no banco de dados
 - **Parâmetros IA**: 9 analisados
 - **Desenvolvimento**: 3 meses
-- **Linhas de Código**: 2.5k+
+- **Linhas de Código**: 3k+
 
 ## 🎯 Status
 
@@ -92,5 +113,6 @@ Analisa **9 parâmetros** em grade 3x3:
 - ✅ **API REST**: Funcional
 - ✅ **MongoDB Atlas**: Integrado
 - ✅ **Sistema IA**: Ativo
-- ✅ **Autenticação Unity**: Implementada
+- ✅ **Autenticação**: Implementada
 - ✅ **Documentação**: Completa
+- ✅ **Segurança**: Variáveis de ambiente

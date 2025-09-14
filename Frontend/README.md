@@ -1,19 +1,21 @@
-# 🎨 EKKO Unity - Frontend Dashboard
+# 🎨 EKKO - Frontend Dashboard
 
-Interface web moderna para visualização dos dados da simulação Unity.
+Interface web moderna para visualização dos dados da simulação desenvolvida na Unity.
 
-## 📁 Estrutura Essencial
+## 📁 Estrutura Modularizada
 
 ```
-FrontendUnity/
+Frontend/
 ├── pages/
-│   ├── index.html         # Página inicial
+│   ├── index.html         # Homepage (modularizada)
 │   ├── login.html         # Login por Unity ID
 │   └── dashboard.html     # Dashboard principal
 ├── css/
-│   └── dashboard.css      # Estilos completos
+│   ├── index.css          # Estilos da homepage (3k+ linhas)
+│   └── dashboard.css      # Estilos do dashboard
 ├── js/
-│   └── unity-dashboard.js # JavaScript modular
+│   ├── index.js           # Lógica da homepage
+│   └── unity-dashboard.js # JavaScript do dashboard
 ├── assets/
 │   └── images/
 │       └── Fundo_menu.png # Background
@@ -25,7 +27,8 @@ FrontendUnity/
 
 ### 1. Iniciar Backend
 ```bash
-cd ../EkkoUnity
+cd ../Backend
+# Configurar .env primeiro
 python start_atlas_api.py
 ```
 
@@ -47,13 +50,13 @@ npx serve .
 ## 🎮 Fluxo de Uso
 
 1. **Página Inicial** → Apresentação do sistema
-2. **Login** → Digite Unity ID (ex: `unity_test123`)
+2. **Login** → Digite ID do usuário (ex: `unity_test123`)
 3. **Dashboard** → Visualização completa dos dados
 
 ## 📊 Seções do Dashboard
 
 ### 🏠 **Início**
-- Métricas Unity em tempo real
+- Métricas da simulação em tempo real
 - Cards com dados do jogador
 - Status de saúde do solo
 - Ações do jogador
@@ -61,7 +64,7 @@ npx serve .
 ### 👤 **Perfil**
 - Dados pessoais completos
 - Informações da propriedade
-- Experiência e Unity stats
+- Experiência e estatísticas da simulação
 - Achievements e auditoria
 
 ### 🧠 **IA & Solo**
@@ -77,7 +80,7 @@ npx serve .
 - Controles de visualização
 - Análise temporal
 
-### 🎮 **Unity**
+### 🎮 **Simulação**
 - Histórico de sessões
 - Performance de jogo
 - Estatísticas detalhadas
@@ -96,8 +99,8 @@ npx serve .
 
 ## 🎨 Design
 
-- **Tema**: Gaming Unity com glassmorphism
-- **Cores**: Verde EKKO + azul tech + roxo Unity
+- **Tema**: Gaming com glassmorphism
+- **Cores**: Verde EKKO + azul tech + roxo
 - **Layout**: Responsivo e modular
 - **Animações**: Transições suaves + hover effects
 - **Ícones**: Font Awesome 6
@@ -114,14 +117,29 @@ npx serve .
 - **Google Fonts** - Tipografia Poppins + Inter
 - **JetBrains Mono** - Fonte para código
 
+## ⚙️ Modularização
+
+### Benefícios
+- ✅ **Manutenção** - Código organizado e fácil de editar
+- ✅ **Performance** - Cache de arquivos CSS/JS
+- ✅ **Reutilização** - Estilos e scripts compartilhados
+- ✅ **Debug** - Localização rápida de problemas
+- ✅ **Colaboração** - Equipe pode trabalhar em arquivos separados
+
+### Arquivos Principais
+- **index.css** - Estilos da homepage
+- **index.js** - Interações da homepage (scroll, animações, contadores)
+- **dashboard.css** - Estilos do dashboard Unity
+- **unity-dashboard.js** - Lógica do dashboard da simulação
+
 ## 🌐 API Integration
 
 **Base URL**: `http://127.0.0.1:8002`
 
 **Endpoints usados**:
-- `/unity/login/{unity_id}` - Login
-- `/unity/dashboard/{unity_id}` - Dados completos
-- `/unity/analise-ia/{unity_id}` - Análise IA
+- `/unity/login/{user_id}` - Login
+- `/unity/dashboard/{user_id}` - Dados completos
+- `/unity/analise-ia/{user_id}` - Análise IA
 
 ## 📱 Responsividade
 
@@ -131,7 +149,7 @@ npx serve .
 
 ## 🔍 Funcionalidades
 
-- ✅ Login por Unity ID
+- ✅ Login por ID do usuário
 - ✅ Dashboard completo
 - ✅ Análise IA avançada
 - ✅ Visualizações interativas
@@ -145,3 +163,4 @@ npx serve .
 - ✅ Documentação técnica
 - ✅ Interface otimizada
 - ✅ Navegação reorganizada
+- ✅ Código modularizado (HTML, CSS, JS separados)
