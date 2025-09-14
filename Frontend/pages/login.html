@@ -325,7 +325,7 @@
                 
                 if (response.ok) {
                     const userData = await response.json();
-                    showMessage(`Bem-vindo, ${userData.nome}! Redirecionando...`, 'success');
+                    showMessage(`Bem-vindo! Redirecionando...`, 'success');
                     
                     localStorage.setItem('unityId', unityId);
                     localStorage.setItem('unityUser', JSON.stringify(userData));
