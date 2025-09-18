@@ -79,4 +79,4 @@ API_DEBUG=False
 
 ---
 
-**EKKO Unity Backend** - Sistema limpo e otimizado 🎯
+**EKKO Backend** - Sistema limpo e otimizado 🎯
