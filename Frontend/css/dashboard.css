@@ -6,6 +6,9 @@
     --orange: #F59E0B;
     --red: #EF4444;
     --amber: #F59E0B;
+    --indigo: #6366f1;
+    --pink: #ec4899;
+    --cyan: #06b6d4;
     
     --gray-50: #F9FAFB;
     --gray-100: #F3F4F6;
@@ -248,15 +251,23 @@ body {
 }
 
 .section-icon.unity-purple {
-    background: linear-gradient(135deg, var(--purple), var(--indigo));
+    background: linear-gradient(135deg, var(--purple), #6366f1);
 }
 
 .section-icon.unity-red {
-    background: linear-gradient(135deg, var(--red), var(--pink));
+    background: linear-gradient(135deg, var(--red), #ec4899);
 }
 
 .section-icon.unity-blue {
-    background: linear-gradient(135deg, var(--tech-blue), var(--cyan));
+    background: linear-gradient(135deg, var(--tech-blue), #06b6d4);
+}
+
+.section-icon.unity-cyan {
+    background: linear-gradient(135deg, #06b6d4, var(--tech-blue));
+}
+
+.section-icon.unity-green {
+    background: linear-gradient(135deg, var(--secondary-green), var(--primary-green));
 }
 
 .section-header h2 {

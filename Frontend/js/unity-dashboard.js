@@ -48,7 +48,9 @@ const UnityDashboard = {
         this.showLoading('monitoring-content', 'Carregando monitoramento...');
 
         try {
-            const response = await fetch(`${this.baseUrl}/unity/dashboard/${unityId}`);
+            // Adicionar timestamp para evitar cache
+            const timestamp = new Date().getTime();
+            const response = await fetch(`${this.baseUrl}/unity/dashboard/${unityId}?t=${timestamp}`);
             
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -276,9 +278,14 @@ const UnityDashboard = {
             
             <!-- Dados do Usuário Atual -->
             <div class="unity-card">
-                <h3 style="color: var(--gray-800); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem;">
-                    <i class="fas fa-user" style="color: var(--purple);"></i> Seu Perfil 
-                </h3>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                    <h3 style="color: var(--gray-800); margin: 0; display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem;">
+                        <i class="fas fa-user" style="color: var(--purple);"></i> Seu Perfil 
+                    </h3>
+                    <button onclick="UnityDashboard.refreshData()" style="background: var(--tech-blue); color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+                        <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                </div>
                 
                 <!-- Métricas Unity -->
                 <div class="unity-metrics" style="margin-bottom: 1.5rem;">
@@ -306,9 +313,11 @@ const UnityDashboard = {
                         </div>
                     </div>
                     
+
+                    
                     <div class="unity-metric-card" style="border-left-color: var(--purple);">
                         <div class="unity-metric-value" style="color: var(--purple);">${gameMetrics.score || 0}</div>
-                        <div class="unity-metric-label">Score Unity</div>
+                        <div class="unity-metric-label">Performance</div>
                         <div class="unity-metric-status" style="color: var(--gray-500);">Última sessão</div>
                     </div>
                 </div>
@@ -349,8 +358,8 @@ const UnityDashboard = {
                     <!-- Gaming Stats -->
                     <div class="unity-card" style="background: var(--gray-50);">
                         <div class="unity-card-header">
-                            <div class="unity-card-icon" style="background: linear-gradient(135deg, var(--unity-primary), var(--unity-secondary));">
-                                <i class="fas fa-trophy"></i>
+                            <div class="unity-card-icon" style="background: linear-gradient(135deg, var(--purple), var(--tech-blue));">
+                                <i class="fas fa-gamepad"></i>
                             </div>
                             <div>
                                 <h3 class="unity-card-title">Performance</h3>
@@ -477,8 +486,8 @@ const UnityDashboard = {
                 </div>
                 
                 <!-- Coluna 3: Experiência & Unity -->
-                <div class="unity-card" style="border-left: 4px solid var(--unity-primary);">
-                    <h3 style="color: var(--unity-primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.1rem;">
+                <div class="unity-card" style="border-left: 4px solid var(--orange);">
+                    <h3 style="color: var(--orange); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.1rem;">
                         <i class="fas fa-graduation-cap"></i> Experiência & Simulação
                     </h3>
                     <div>
@@ -658,18 +667,30 @@ const UnityDashboard = {
             <!-- Stats Resumo -->
             <div class="unity-metrics" style="margin-bottom: 2rem;">
                 <div class="unity-metric-card" style="border-left-color: var(--primary-green);">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <i class="fas fa-play" style="color: var(--primary-green); font-size: 1.2rem;"></i>
+                    </div>
                     <div class="unity-metric-value" style="color: var(--primary-green);">${totalSessions}</div>
                     <div class="unity-metric-label">Total de Sessões</div>
                 </div>
                 <div class="unity-metric-card" style="border-left-color: var(--tech-blue);">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <i class="fas fa-clock" style="color: var(--tech-blue); font-size: 1.2rem;"></i>
+                    </div>
                     <div class="unity-metric-value" style="color: var(--tech-blue);">${Math.floor(totalPlaytime / 60)}</div>
                     <div class="unity-metric-label">Minutos Jogados</div>
                 </div>
                 <div class="unity-metric-card" style="border-left-color: var(--orange);">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <i class="fas fa-trophy" style="color: var(--orange); font-size: 1.2rem;"></i>
+                    </div>
                     <div class="unity-metric-value" style="color: var(--orange);">${bestScore}</div>
                     <div class="unity-metric-label">Melhor Score</div>
                 </div>
                 <div class="unity-metric-card" style="border-left-color: var(--purple);">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <i class="fas fa-chart-bar" style="color: var(--purple); font-size: 1.2rem;"></i>
+                    </div>
                     <div class="unity-metric-value" style="color: var(--purple);">${avgSessionTime}</div>
                     <div class="unity-metric-label">Tempo Médio (min)</div>
                 </div>
@@ -851,8 +872,9 @@ const UnityDashboard = {
     // AI Content - Nova implementação com análise real
     async loadAIContent(unityId) {
         try {
-            // Buscar análise IA do backend
-            const response = await fetch(`${this.baseUrl}/unity/analise-ia/${unityId}`);
+            // Buscar análise IA do backend com cache-busting
+            const timestamp = new Date().getTime();
+            const response = await fetch(`${this.baseUrl}/unity/analise-ia/${unityId}?t=${timestamp}`);
             
             if (response.ok) {
                 const analiseIA = await response.json();
@@ -864,6 +886,34 @@ const UnityDashboard = {
         } catch (error) {
             console.error('Erro ao carregar IA:', error);
             this.renderAnaliseLocal();
+        }
+    },
+    
+    // Função para forçar atualização dos dados
+    async refreshData() {
+        if (!this.currentUnityId) return;
+        
+        this.showLoading('ai-content', 'Atualizando dados...');
+        this.showLoading('dashboard-content', 'Atualizando...');
+        
+        try {
+            // Recarregar dados do dashboard
+            const timestamp = new Date().getTime();
+            const response = await fetch(`${this.baseUrl}/unity/dashboard/${this.currentUnityId}?t=${timestamp}`);
+            
+            if (response.ok) {
+                const data = await response.json();
+                this.currentUserData = data;
+                
+                // Atualizar seções
+                this.loadDashboardContent(data);
+                await this.loadAIContent(this.currentUnityId);
+                
+                this.showMessage('Dados atualizados com sucesso!', 'success', 3000);
+            }
+        } catch (error) {
+            console.error('Erro ao atualizar:', error);
+            this.showMessage('Erro ao atualizar dados', 'error', 5000);
         }
     },
     
@@ -884,10 +934,15 @@ const UnityDashboard = {
                         </h2>
                         <p style="color: var(--gray-600); margin: 0.5rem 0 0 0; font-size: 1rem;">Diagnóstico completo baseado em IA</p>
                     </div>
-                    <div style="background: var(--white); padding: 0.75rem 1.5rem; border-radius: 12px; border: 1px solid var(--gray-200); box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-seedling" style="color: var(--secondary-green);"></i>
-                            <span style="font-weight: 600; color: var(--gray-800);">${data.cultivo_principal || 'Cultivo Geral'}</span>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <button onclick="UnityDashboard.refreshData()" style="background: var(--secondary-green); color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+                            <i class="fas fa-sync-alt"></i> Atualizar IA
+                        </button>
+                        <div style="background: var(--white); padding: 0.75rem 1.5rem; border-radius: 12px; border: 1px solid var(--gray-200); box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-seedling" style="color: var(--secondary-green);"></i>
+                                <span style="font-weight: 600; color: var(--gray-800);">${data.cultivo_principal || 'Cultivo Geral'}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1366,10 +1421,6 @@ const UnityDashboard = {
         }
     },
 
-
-
-
-
     showMessage(text, type = 'success', duration = 5000) {
         const messageDiv = document.getElementById("mensagem");
         if (messageDiv) {
@@ -1583,8 +1634,6 @@ const UnityDashboard = {
 
     },
     
-
-    
     // Cores Unity por valor
     getUnityColorByValue(valor, parametro) {
         let cor = '#10B981'; // Verde (ideal)
@@ -1755,7 +1804,7 @@ const UnityDashboard = {
                 </h3>
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;">
                     <div style="text-align: center; padding: 1.5rem; background: var(--gray-50); border-radius: 12px; border: 2px solid var(--secondary-green);">
-                        <div style="font-size: 2rem; font-weight: 700; color: var(--secondary-green); margin-bottom: 0.5rem;">2.5k+</div>
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--secondary-green); margin-bottom: 0.5rem;">4.5k+</div>
                         <div style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">Linhas de Código</div>
                     </div>
                     <div style="text-align: center; padding: 1.5rem; background: var(--gray-50); border-radius: 12px; border: 2px solid var(--tech-blue);">
@@ -1821,15 +1870,32 @@ const UnityDashboard = {
         `;
     },
     
-    // Criar canvas simples para mapa de calor
+    // Criar mapa de calor funcional
     createHeatmapCanvas(canvas) {
         const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#f3f4f6';
-        ctx.fillRect(0, 0, 400, 300);
-        ctx.fillStyle = '#6b7280';
-        ctx.font = '16px Inter';
-        ctx.textAlign = 'center';
-        ctx.fillText('Mapa de Calor Unity', 200, 150);
+        canvas.width = 400;
+        canvas.height = 300;
+        
+        // Criar gradiente de cores
+        const gradient = ctx.createLinearGradient(0, 0, 400, 300);
+        gradient.addColorStop(0, '#10B981'); // Verde
+        gradient.addColorStop(0.5, '#F59E0B'); // Amarelo
+        gradient.addColorStop(1, '#EF4444'); // Vermelho
+        
+        // Desenhar mapa de calor simulado
+        for (let x = 0; x < 400; x += 20) {
+            for (let y = 0; y < 300; y += 20) {
+                const intensity = Math.random();
+                if (intensity > 0.7) {
+                    ctx.fillStyle = '#EF4444';
+                } else if (intensity > 0.4) {
+                    ctx.fillStyle = '#F59E0B';
+                } else {
+                    ctx.fillStyle = '#10B981';
+                }
+                ctx.fillRect(x, y, 18, 18);
+            }
+        }
     },
     
     showEmpty(elementId, message = 'Nenhum dado encontrado') {
@@ -1844,6 +1910,10 @@ function showSection(sectionId, clickedElement) {
 
 function logout() {
     UnityDashboard.logout();
+}
+
+function refreshData() {
+    UnityDashboard.refreshData();
 }
 
 // Initialize

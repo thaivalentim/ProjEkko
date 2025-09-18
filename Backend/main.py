@@ -10,6 +10,7 @@ from typing import Dict, Any
 from datetime import datetime
 import uuid
 import uvicorn
+import random
 
 
 # Imports locais
@@ -40,6 +41,7 @@ class SoilData(BaseModel):
     umidade: float
     temperatura: float
     salinidade: float
+    condutividade: float
     nitrogenio: float
     fosforo: float
     potassio: float
@@ -127,7 +129,8 @@ def save_soil(unity_id: str, soil: SoilData):
             "ph": soil.ph,
             "umidade": soil.umidade,
             "temperatura": soil.temperatura,
-            "salinidade": soil.salinidade
+            "salinidade": soil.salinidade,
+            "condutividade": soil.condutividade
         },
         "nutrients": {
             "nitrogenio": soil.nitrogenio,
@@ -222,6 +225,59 @@ def analise_ia(unity_id: str):
             "tendencia_geral": analyze_trend(soil_history),
             "nivel_sustentabilidade": calculate_sustainability(latest_soil, profile)
         }
+    }
+
+@app.get("/unity/recreate-test-data")
+def recreate_test_data():
+    import random
+    
+    # Buscar todos os perfis
+    profiles = list(unity_profiles.find({}))
+    
+    if not profiles:
+        return {"status": "error", "message": "Nenhum perfil encontrado"}
+    
+    # Criar dados de teste para cada perfil
+    created_count = 0
+    for profile in profiles:
+        unity_id = profile["_id"]
+        
+        # Criar 3 registros de solo com condutividade
+        for i in range(3):
+            soil_doc = {
+                "_id": f"soil_{unity_id}_{int(datetime.utcnow().timestamp())}_{i}",
+                "unity_id": unity_id,
+                "timestamp": datetime.utcnow(),
+                "soil_parameters": {
+                    "ph": round(random.uniform(5.5, 7.5), 1),
+                    "umidade": round(random.uniform(30, 80), 0),
+                    "temperatura": round(random.uniform(18, 35), 0),
+                    "salinidade": round(random.uniform(200, 1000), 0),
+                    "condutividade": round(random.uniform(0.8, 2.5), 1)
+                },
+                "nutrients": {
+                    "nitrogenio": round(random.uniform(10, 120), 0),
+                    "fosforo": round(random.uniform(5, 60), 0),
+                    "potassio": round(random.uniform(80, 300), 0)
+                },
+                "player_actions": {
+                    "irrigacao": round(random.uniform(40, 90), 0),
+                    "fertilizante_npk": {"N": 20, "P": 10, "K": 15}
+                },
+                "game_metrics": {
+                    "score": round(random.uniform(300, 950), 0),
+                    "money_spent": round(random.uniform(100, 500), 2),
+                    "sustainability_index": round(random.uniform(60, 95), 0)
+                }
+            }
+            
+            unity_soil_data.insert_one(soil_doc)
+            created_count += 1
+    
+    return {
+        "status": "success",
+        "message": f"Criados {created_count} registros de solo com condutividade",
+        "profiles_updated": len(profiles)
     }
 
 if __name__ == "__main__":
