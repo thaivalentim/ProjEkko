@@ -1,4 +1,4 @@
-# EKKO Unity - Dependências Python
+# EKKO - Dependências Python
 # Instalar com: pip install -r requirements_unity.txt
 
 # FastAPI e servidor

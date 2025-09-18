@@ -24,18 +24,8 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
 // Animated counters
 function animateCounter(element, target) {
-    let current = 0;
-    const increment = target / 100;
-    const timer = setInterval(() => {
-        current += increment;
-        if (current >= target) {
-            const finalValue = element.getAttribute('data-target') === '95' ? target + '%' : target;
-            element.textContent = finalValue;
-            clearInterval(timer);
-        } else {
-            element.textContent = Math.floor(current);
-        }
-    }, 20);
+    const finalValue = element.getAttribute('data-target') === '95' ? target + '%' : target;
+    element.textContent = finalValue;
 }
 
 // Intersection Observer for animations
@@ -51,33 +41,17 @@ const observer = new IntersectionObserver((entries) => {
     });
 });
 
-// Observe stat numbers (both regular and environmental)
+// Observe all stat numbers
 document.querySelectorAll('[data-target]').forEach(el => {
     observer.observe(el);
 });
 
-// Environmental stats counter animation
-const envObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            const target = entry.target.getAttribute('data-target');
-            if (target && !entry.target.classList.contains('animated')) {
-                entry.target.classList.add('animated');
-                if (target === '1') {
-                    // Special case for "1 bi"
-                    entry.target.textContent = '1';
-                } else {
-                    animateCounter(entry.target, parseInt(target));
-                }
-            }
-        }
-    });
+// Special handling for environmental stats
+document.querySelectorAll('.env-stat-number[data-target]').forEach(el => {
+    observer.observe(el);
 });
 
-// Observe environmental stat numbers
-document.querySelectorAll('.env-stat-number[data-target]').forEach(el => {
-    envObserver.observe(el);
-});
+
 
 // Feature cards interaction
 document.querySelectorAll('.feature-card').forEach(card => {

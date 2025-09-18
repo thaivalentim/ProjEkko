@@ -61,7 +61,6 @@ const UnityDashboard = {
             }
 
             this.currentUserData = data;
-            this.showNavigation();
             
             this.loadDashboardContent(data);
             this.loadProfileContent(data);
@@ -1367,14 +1366,7 @@ const UnityDashboard = {
         }
     },
 
-    showNavigation() {
-        document.getElementById('nav-profile').style.display = 'block';
-        document.getElementById('nav-ai').style.display = 'block';
-        document.getElementById('nav-heatmap').style.display = 'block';
-        document.getElementById('nav-readings').style.display = 'block';
-        document.getElementById('nav-development').style.display = 'block';
-        document.getElementById('nav-monitoring').style.display = 'block';
-    },
+
 
 
 
@@ -1586,10 +1578,7 @@ const UnityDashboard = {
             this.unityTimelineChart.update();
         }
         
-        // Atualizar mapa de calor real
-        if (dadosHeatmap.length > 0) {
-            this.updateHeatmapCanvas(dadosHeatmap, parametro);
-        }
+
         
 
     },
@@ -1832,110 +1821,19 @@ const UnityDashboard = {
         `;
     },
     
-    // Criar canvas para mapa de calor real
+    // Criar canvas simples para mapa de calor
     createHeatmapCanvas(canvas) {
         const ctx = canvas.getContext('2d');
-        const width = canvas.width = 400;
-        const height = canvas.height = 300;
-        
-        // Limpar canvas
-        ctx.clearRect(0, 0, width, height);
-        
-        // Desenhar placeholder
         ctx.fillStyle = '#f3f4f6';
-        ctx.fillRect(0, 0, width, height);
-        
+        ctx.fillRect(0, 0, 400, 300);
         ctx.fillStyle = '#6b7280';
         ctx.font = '16px Inter';
         ctx.textAlign = 'center';
-        ctx.fillText('Mapa de Calor Unity', width/2, height/2);
-        ctx.fillText('Selecione um parâmetro', width/2, height/2 + 25);
-    },
-    
-    // Atualizar mapa de calor real
-    updateHeatmapCanvas(dados, parametro) {
-        const canvas = document.getElementById('unityHeatmapChart');
-        if (!canvas) return;
-        
-        const ctx = canvas.getContext('2d');
-        const width = canvas.width = 400;
-        const height = canvas.height = 300;
-        
-        const cultivos = [...new Set(dados.map(d => d.cultivo))];
-        const estacoes = ['Plantio', 'Crescimento', 'Floração', 'Colheita'];
-        
-        const cellWidth = width / cultivos.length;
-        const cellHeight = height / estacoes.length;
-        
-        // Limpar canvas
-        ctx.clearRect(0, 0, width, height);
-        
-        estacoes.forEach((estacao, i) => {
-            cultivos.forEach((cultivo, j) => {
-                const dadosCelula = dados.filter(d => d.cultivo === cultivo && d.estacao === estacao);
-                
-                let cor = '#e5e7eb'; // Cinza padrão
-                if (dadosCelula.length > 0) {
-                    const valorMedio = dadosCelula.reduce((sum, d) => sum + d.valor, 0) / dadosCelula.length;
-                    cor = this.getUnityColorByValue(valorMedio, parametro);
-                }
-                
-                const x = j * cellWidth;
-                const y = i * cellHeight;
-                
-                // Desenhar célula
-                ctx.fillStyle = cor;
-                ctx.fillRect(x, y, cellWidth, cellHeight);
-                
-                // Borda
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(x, y, cellWidth, cellHeight);
-                
-                // Texto
-                if (dadosCelula.length > 0) {
-                    const valorMedio = dadosCelula.reduce((sum, d) => sum + d.valor, 0) / dadosCelula.length;
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = 'bold 12px Inter';
-                    ctx.textAlign = 'center';
-                    ctx.fillText(valorMedio.toFixed(1), x + cellWidth/2, y + cellHeight/2 + 4);
-                }
-            });
-        });
-        
-        // Labels dos eixos
-        ctx.fillStyle = '#374151';
-        ctx.font = '11px Inter';
-        ctx.textAlign = 'center';
-        
-        // Labels cultivos (eixo X)
-        cultivos.forEach((cultivo, j) => {
-            const x = j * cellWidth + cellWidth/2;
-            ctx.save();
-            ctx.translate(x, height + 15);
-            ctx.fillText(cultivo, 0, 0);
-            ctx.restore();
-        });
-        
-        // Labels estações (eixo Y)
-        ctx.textAlign = 'right';
-        estacoes.forEach((estacao, i) => {
-            const y = i * cellHeight + cellHeight/2;
-            ctx.fillText(estacao, -10, y + 4);
-        });
+        ctx.fillText('Mapa de Calor Unity', 200, 150);
     },
     
     showEmpty(elementId, message = 'Nenhum dado encontrado') {
-        const element = document.getElementById(elementId);
-        if (element) {
-            element.innerHTML = `
-                <div style="text-align: center; padding: 3rem; background: var(--gray-50); border-radius: 12px;">
-                    <i class="fas fa-inbox" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
-                    <h3 style="color: var(--gray-600); margin-bottom: 0.5rem;">Sem dados Unity</h3>
-                    <p style="color: var(--gray-500);">${message}</p>
-                </div>
-            `;
-        }
+        this.showError(elementId, message);
     }
 };
 
