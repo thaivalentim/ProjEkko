@@ -25,14 +25,14 @@ API_PORT = int(os.getenv("API_PORT", "8002"))
 API_DEBUG = os.getenv("API_DEBUG", "False").lower() == "true"
 
 if not MONGO_URI:
-    raise ValueError("UNITY_MONGO_URI não configurada. Configure o arquivo .env")
+    raise ValueError("MONGO_URI não configurada. Configure o arquivo .env")
 
 client = MongoClient(MONGO_URI)
 db = client[DB_NAME]
 
 # Collections (usando as que você já tem)
 unity_profiles = db["Python_userData"]  # Reutilizar collection existente
-unity_soil_data = db["Unity_soilData"]   # Usar collection Unity existente
+unity_soil_data = db["Unity_soilData"]   # Usar collection Unity existente'
 
 app = FastAPI(title="EKKO Unity API - Atlas", version="1.0.0")
 
@@ -135,7 +135,7 @@ def login(unity_id: str):
 def save_soil(unity_id: str, soil: SoilData):
     # Verificar se perfil existe
     if not unity_profiles.find_one({"_id": unity_id}):
-        raise HTTPException(status_code=404, detail="Unity ID não encontrado")
+        raise HTTPException(status_code=404, detail="ID não encontrado")
     
     soil_doc = {
         "_id": f"soil_{unity_id}_{int(datetime.utcnow().timestamp())}",
@@ -356,7 +356,7 @@ def create_test_data():
             "message": str(e)
         }
 
-# Endpoint IA avançado
+# Endpoint IA 
 @app.get("/unity/analise-ia/{unity_id}")
 def analise_ia(unity_id: str):
     profile = unity_profiles.find_one({"_id": unity_id})
@@ -756,4 +756,4 @@ if __name__ == "__main__":
     print("Status: http://127.0.0.1:8002/unity/status")
     print("=" * 50)
     
-    uvicorn.run(app, host=API_HOST, port=API_PORT, debug=API_DEBUG)
+    uvicorn.run(app, host=API_HOST, port=API_PORT, reload=API_DEBUG)

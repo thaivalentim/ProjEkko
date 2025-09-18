@@ -29,7 +29,8 @@ function animateCounter(element, target) {
     const timer = setInterval(() => {
         current += increment;
         if (current >= target) {
-            element.textContent = target;
+            const finalValue = element.getAttribute('data-target') === '95' ? target + '%' : target;
+            element.textContent = finalValue;
             clearInterval(timer);
         } else {
             element.textContent = Math.floor(current);
@@ -50,9 +51,32 @@ const observer = new IntersectionObserver((entries) => {
     });
 });
 
-// Observe stat numbers
+// Observe stat numbers (both regular and environmental)
 document.querySelectorAll('[data-target]').forEach(el => {
     observer.observe(el);
+});
+
+// Environmental stats counter animation
+const envObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const target = entry.target.getAttribute('data-target');
+            if (target && !entry.target.classList.contains('animated')) {
+                entry.target.classList.add('animated');
+                if (target === '1') {
+                    // Special case for "1 bi"
+                    entry.target.textContent = '1';
+                } else {
+                    animateCounter(entry.target, parseInt(target));
+                }
+            }
+        }
+    });
+});
+
+// Observe environmental stat numbers
+document.querySelectorAll('.env-stat-number[data-target]').forEach(el => {
+    envObserver.observe(el);
 });
 
 // Feature cards interaction

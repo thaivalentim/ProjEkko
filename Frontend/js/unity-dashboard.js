@@ -1,4 +1,4 @@
-// Unity Dashboard JavaScript - Modular
+//Dashboard JavaScript 
 const UnityDashboard = {
     baseUrl: "http://127.0.0.1:8002",
     currentUnityId: null,
@@ -11,7 +11,7 @@ const UnityDashboard = {
         });
     },
 
-    // Autenticação Unity
+    // Autenticação 
     checkAuthentication() {
         const urlParams = new URLSearchParams(window.location.search);
         const unityIdParam = urlParams.get('unityId');
@@ -29,22 +29,22 @@ const UnityDashboard = {
         }
     },
 
-    // Logout Unity
+    // Logout 
     logout() {
         localStorage.removeItem('unityId');
         localStorage.removeItem('unityUser');
         window.location.href = 'login.html';
     },
 
-    // Carregar perfil Unity
+    // Carregar perfil
     async loadUnityProfile(unityId) {
         if (!unityId) return;
 
-        this.showLoading('dashboard-content', 'Carregando dados Unity...');
-        this.showLoading('profile-content', 'Carregando perfil Unity...');
-        this.showLoading('ai-content', 'Carregando análise IA...');
+        this.showLoading('dashboard-content', 'Carregando seus dados...');
+        this.showLoading('profile-content', 'Carregando perfil...');
+        this.showLoading('ai-content', 'Carregando análises de IA...');
         this.showLoading('heatmap-content', 'Carregando estatísticas...');
-        this.showLoading('readings-content', 'Carregando Unity...');
+        this.showLoading('readings-content', 'Carregando dados da simulação...');
         this.showLoading('monitoring-content', 'Carregando monitoramento...');
 
         try {
@@ -57,7 +57,7 @@ const UnityDashboard = {
             const data = await response.json();
             
             if (!data || !data.profile) {
-                throw new Error('Dados Unity inválidos');
+                throw new Error('Dados são inválidos.');
             }
 
             this.currentUserData = data;
@@ -78,23 +78,23 @@ const UnityDashboard = {
             }, 100);
             
             this.showSection('dashboard', document.getElementById('nav-dashboard'));
-            this.showMessage(`Perfil Unity carregado com sucesso!`, 'success', 3000);
+            this.showMessage(`Perfil carregado com sucesso!`, 'success', 3000);
             
         } catch (error) {
-            console.error('Erro Unity:', error);
-            let errorMsg = "Erro ao conectar com Unity API.";
+            console.error('Erro:', error);
+            let errorMsg = "Erro ao conectar com a API.";
             
             if (error.name === 'TypeError') {
-                errorMsg = "Servidor Unity não encontrado. Verifique se a API está rodando na porta 8001.";
+                errorMsg = "Servidor não encontrado. Verifique se a API está rodando na porta 8002.";
             }
             
             this.showMessage(errorMsg, 'error', 0);
-            this.showError('dashboard-content', 'Falha na conexão Unity');
-            this.showError('profile-content', 'Falha na conexão Unity');
-            this.showError('ai-content', 'Falha na conexão Unity');
-            this.showError('heatmap-content', 'Falha na conexão Unity');
-            this.showError('readings-content', 'Falha na conexão Unity');
-            this.showError('monitoring-content', 'Falha na conexão Unity');
+            this.showError('dashboard-content', 'Falha na conexão');
+            this.showError('profile-content', 'Falha na conexão');
+            this.showError('ai-content', 'Falha na conexão');
+            this.showError('heatmap-content', 'Falha na conexão');
+            this.showError('readings-content', 'Falha na conexão');
+            this.showError('monitoring-content', 'Falha na conexão');
         }
     },
 
@@ -278,7 +278,7 @@ const UnityDashboard = {
             <!-- Dados do Usuário Atual -->
             <div class="unity-card">
                 <h3 style="color: var(--gray-800); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem;">
-                    <i class="fas fa-user" style="color: var(--purple);"></i> Seu Perfil Unity
+                    <i class="fas fa-user" style="color: var(--purple);"></i> Seu Perfil 
                 </h3>
                 
                 <!-- Métricas Unity -->
@@ -354,7 +354,7 @@ const UnityDashboard = {
                                 <i class="fas fa-trophy"></i>
                             </div>
                             <div>
-                                <h3 class="unity-card-title">Performance Unity</h3>
+                                <h3 class="unity-card-title">Performance</h3>
                                 <p class="unity-card-subtitle">Última sessão</p>
                             </div>
                         </div>
@@ -464,7 +464,7 @@ const UnityDashboard = {
                         </div>
                         <div class="unity-data-row">
                             <i class="fas fa-layer-group"></i>
-                            <span><strong>Tipo Solo:</strong> ${propriedade.tipo_solo || 'N/A'}</span>
+                            <span><strong>Tipo de Solo:</strong> ${propriedade.tipo_solo || 'N/A'}</span>
                         </div>
                         <div class="unity-data-row">
                             <i class="fas fa-tint"></i>
@@ -480,24 +480,24 @@ const UnityDashboard = {
                 <!-- Coluna 3: Experiência & Unity -->
                 <div class="unity-card" style="border-left: 4px solid var(--unity-primary);">
                     <h3 style="color: var(--unity-primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.1rem;">
-                        <i class="fas fa-graduation-cap"></i> Experiência & Unity
+                        <i class="fas fa-graduation-cap"></i> Experiência & Simulação
                     </h3>
                     <div>
                         <div class="unity-data-row">
                             <i class="fas fa-seedling"></i>
-                            <span><strong>Anos Agricultura:</strong> ${experiencia.anos_agricultura || 0} anos</span>
+                            <span><strong>Anos de Agricultura:</strong> ${experiencia.anos_agricultura || 0} anos</span>
                         </div>
                         <div class="unity-data-row">
                             <i class="fas fa-microchip"></i>
-                            <span><strong>Nível Tecnologia:</strong> ${experiencia.nivel_tecnologia || 'N/A'}</span>
+                            <span><strong>Nível de Tecnologia:</strong> ${experiencia.nivel_tecnologia || 'N/A'}</span>
                         </div>
                         <div class="unity-data-row">
                             <i class="fas fa-leaf"></i>
-                            <span><strong>Uso Defensivos:</strong> ${experiencia.uso_defensivos || 'N/A'}</span>
+                            <span><strong>Uso de Defensivos:</strong> ${experiencia.uso_defensivos || 'N/A'}</span>
                         </div>
                         <div class="unity-data-row">
                             <i class="fas fa-level-up-alt"></i>
-                            <span><strong>Nível Unity:</strong> ${unityStats.nivel || 'Iniciante'}</span>
+                            <span><strong>Nível na Simulação:</strong> ${unityStats.nivel || 'Iniciante'}</span>
                         </div>
                         <div class="unity-data-row">
                             <i class="fas fa-play"></i>
@@ -742,11 +742,11 @@ const UnityDashboard = {
                     <div style="text-align: center; padding: 3rem; background: var(--gray-50); border-radius: 12px;">
                         <i class="fas fa-gamepad" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
                         <h4 style="color: var(--gray-600); margin-bottom: 0.5rem;">Nenhuma Sessão Registrada</h4>
-                        <p style="color: var(--gray-500);">Comece a jogar Unity para ver seu histórico aqui!</p>
+                        <p style="color: var(--gray-500);">Comece a jogar para ver seu histórico aqui!</p>
                         <div style="margin-top: 1.5rem;">
                             <div class="unity-data-row" style="justify-content: center; background: white; display: inline-flex; padding: 1rem 2rem; border-radius: 8px;">
                                 <i class="fas fa-calendar-plus"></i>
-                                <span><strong>Conta Criada:</strong> ${auditoria.created_at ? new Date(auditoria.created_at).toLocaleDateString('pt-BR') : 'N/A'}</span>
+                                <span><strong>Conta criada em:</strong> ${auditoria.created_at ? new Date(auditoria.created_at).toLocaleDateString('pt-BR') : 'N/A'}</span>
                             </div>
                         </div>
                     </div>
@@ -1693,7 +1693,7 @@ const UnityDashboard = {
                         </div>
                         <div class="unity-data-row">
                             <i class="fas fa-shield-alt"></i>
-                            <span><strong>Autenticação:</strong> Sistema Unity ID</span>
+                            <span><strong>Autenticação:</strong> Sistema de acesso via ID</span>
                         </div>
                         <div class="unity-data-row">
                             <i class="fas fa-brain"></i>
