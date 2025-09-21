@@ -6,11 +6,10 @@ FastAPI com MongoDB Atlas
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from datetime import datetime
 import uuid
 import uvicorn
-import random
 
 
 # Imports locais
@@ -45,8 +44,16 @@ class SoilData(BaseModel):
     nitrogenio: float
     fosforo: float
     potassio: float
-    player_actions: Dict[str, Any]
-    game_metrics: Dict[str, Any]
+    # Campos opcionais
+    densidade: Optional[float] = 1.2
+    materia_organica: Optional[float] = 3.5
+    calcio: Optional[float] = 500
+    magnesio: Optional[float] = 120
+    enxofre: Optional[float] = 20
+    player_actions: Optional[Dict[str, Any]] = None
+    game_metrics: Optional[Dict[str, Any]] = None
+    cultivo_atual: Optional[str] = "Milho"
+    estacao: Optional[str] = "Crescimento"
 
 @app.get("/unity/status")
 def get_status():
@@ -121,24 +128,51 @@ def save_soil(unity_id: str, soil: SoilData):
     if not unity_profiles.find_one({"_id": unity_id}):
         raise HTTPException(status_code=404, detail="ID não encontrado")
     
+    # Valores padrão para campos não enviados pelo Unity
+    default_actions = {
+        "irrigacao": round(soil.umidade * 0.8, 2),
+        "fertilizante_npk": {
+            "N": round(soil.nitrogenio * 0.4, 2),
+            "P": round(soil.fosforo * 0.2, 2),
+            "K": round(soil.potassio * 0.3, 2)
+        },
+        "calagem": round(0.5, 2),
+        "materia_organica_adicionada": round(1.0, 2)
+    }
+    
+    default_metrics = {
+        "score": int((soil.ph * 100) + (soil.umidade * 10)),
+        "money_spent": round(soil.condutividade * 200, 2),
+        "sustainability_index": round(min(soil.ph / 7.0, 1.0), 2),
+        "productivity_estimate": int((soil.nitrogenio + soil.fosforo + soil.potassio) / 3)
+    }
+    
     soil_doc = {
         "_id": f"soil_{unity_id}_{int(datetime.utcnow().timestamp())}",
         "unity_id": unity_id,
         "timestamp": datetime.utcnow(),
         "soil_parameters": {
-            "ph": soil.ph,
-            "umidade": soil.umidade,
-            "temperatura": soil.temperatura,
-            "salinidade": soil.salinidade,
-            "condutividade": soil.condutividade
+            "ph": round(soil.ph, 2),
+            "umidade": round(soil.umidade, 2),
+            "temperatura": round(soil.temperatura, 2),
+            "salinidade": round(soil.salinidade, 2),
+            "condutividade": round(soil.condutividade, 2),
+            "densidade": round(soil.densidade, 2),
+            "materia_organica": round(soil.materia_organica, 2)
         },
         "nutrients": {
-            "nitrogenio": soil.nitrogenio,
-            "fosforo": soil.fosforo,
-            "potassio": soil.potassio
+            "nitrogenio": round(soil.nitrogenio, 2),
+            "fosforo": round(soil.fosforo, 2),
+            "potassio": round(soil.potassio, 2),
+            "calcio": round(soil.calcio, 2),
+            "magnesio": round(soil.magnesio, 2),
+            "enxofre": round(soil.enxofre, 2)
         },
-        "player_actions": soil.player_actions,
-        "game_metrics": soil.game_metrics
+        "player_actions": soil.player_actions or default_actions,
+        "game_metrics": soil.game_metrics or default_metrics,
+        "cultivo_atual": soil.cultivo_atual,
+        "estacao": soil.estacao,
+        "health_score": int((soil.ph * 10) + (soil.umidade * 0.5) + 30)
     }
     
     result = unity_soil_data.insert_one(soil_doc)
@@ -192,7 +226,62 @@ def list_ids():
         "unity_ids": unity_ids
     }
 
-
+@app.get("/unity/monitoring/{unity_id}")
+def get_monitoring_data(unity_id: str, period: str = "24h"):
+    from datetime import datetime, timedelta
+    
+    # Validar usuário
+    if not unity_profiles.find_one({"_id": unity_id}):
+        raise HTTPException(status_code=404, detail="Unity ID não encontrado")
+    
+    # Calcular data limite baseada no período real
+    now = datetime.utcnow()
+    time_deltas = {
+        "1h": timedelta(hours=1),
+        "6h": timedelta(hours=6), 
+        "24h": timedelta(hours=24),
+        "7d": timedelta(days=7)
+    }
+    
+    time_limit = now - time_deltas.get(period, timedelta(hours=24))
+    
+    # Buscar dados filtrados por timestamp real
+    soil_data = list(unity_soil_data.find({
+        "unity_id": unity_id,
+        "timestamp": {"$gte": time_limit}
+    }).sort("timestamp", -1))
+    
+    # Converter formato para frontend
+    monitoring_data = []
+    for item in soil_data:
+        # Calcular status baseado nos parâmetros
+        ph = item["soil_parameters"]["ph"]
+        status = "ideal" if 6.0 <= ph <= 7.0 else "atencao" if 5.5 <= ph <= 7.5 else "critico"
+        
+        monitoring_data.append({
+            "hora": item["timestamp"].strftime("%H:%M"),
+            "ph": item["soil_parameters"]["ph"],
+            "umidade": item["soil_parameters"]["umidade"],
+            "temp": item["soil_parameters"]["temperatura"],
+            "salinidade": item["soil_parameters"]["salinidade"],
+            "condutividade": item["soil_parameters"]["condutividade"],
+            "n": item["nutrients"]["nitrogenio"],
+            "p": item["nutrients"]["fosforo"],
+            "k": item["nutrients"]["potassio"],
+            "status": status
+        })
+    
+    return {
+        "status": "success",
+        "unity_id": unity_id,
+        "period": period,
+        "time_filter": {
+            "from": time_limit.isoformat(),
+            "to": now.isoformat(),
+            "total_found": len(monitoring_data)
+        },
+        "data": monitoring_data
+    }
 
 @app.get("/unity/analise-ia/{unity_id}")
 def analise_ia(unity_id: str):
@@ -225,59 +314,6 @@ def analise_ia(unity_id: str):
             "tendencia_geral": analyze_trend(soil_history),
             "nivel_sustentabilidade": calculate_sustainability(latest_soil, profile)
         }
-    }
-
-@app.get("/unity/recreate-test-data")
-def recreate_test_data():
-    import random
-    
-    # Buscar todos os perfis
-    profiles = list(unity_profiles.find({}))
-    
-    if not profiles:
-        return {"status": "error", "message": "Nenhum perfil encontrado"}
-    
-    # Criar dados de teste para cada perfil
-    created_count = 0
-    for profile in profiles:
-        unity_id = profile["_id"]
-        
-        # Criar 3 registros de solo com condutividade
-        for i in range(3):
-            soil_doc = {
-                "_id": f"soil_{unity_id}_{int(datetime.utcnow().timestamp())}_{i}",
-                "unity_id": unity_id,
-                "timestamp": datetime.utcnow(),
-                "soil_parameters": {
-                    "ph": round(random.uniform(5.5, 7.5), 1),
-                    "umidade": round(random.uniform(30, 80), 0),
-                    "temperatura": round(random.uniform(18, 35), 0),
-                    "salinidade": round(random.uniform(200, 1000), 0),
-                    "condutividade": round(random.uniform(0.8, 2.5), 1)
-                },
-                "nutrients": {
-                    "nitrogenio": round(random.uniform(10, 120), 0),
-                    "fosforo": round(random.uniform(5, 60), 0),
-                    "potassio": round(random.uniform(80, 300), 0)
-                },
-                "player_actions": {
-                    "irrigacao": round(random.uniform(40, 90), 0),
-                    "fertilizante_npk": {"N": 20, "P": 10, "K": 15}
-                },
-                "game_metrics": {
-                    "score": round(random.uniform(300, 950), 0),
-                    "money_spent": round(random.uniform(100, 500), 2),
-                    "sustainability_index": round(random.uniform(60, 95), 0)
-                }
-            }
-            
-            unity_soil_data.insert_one(soil_doc)
-            created_count += 1
-    
-    return {
-        "status": "success",
-        "message": f"Criados {created_count} registros de solo com condutividade",
-        "profiles_updated": len(profiles)
     }
 
 if __name__ == "__main__":

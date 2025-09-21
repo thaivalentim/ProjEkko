@@ -20,9 +20,15 @@ const UnityDashboard = {
         if (unityIdParam) {
             this.currentUnityId = unityIdParam;
             localStorage.setItem('unityId', unityIdParam);
+            localStorage.setItem('unity_id', unityIdParam); // Para compatibilidade com monitoramento
+            sessionStorage.setItem('unity_id', unityIdParam); // Para sessão
+            window.currentUnityId = unityIdParam; // Global para módulos
             setTimeout(() => this.loadUnityProfile(unityIdParam), 500);
         } else if (storedUnityId) {
             this.currentUnityId = storedUnityId;
+            localStorage.setItem('unity_id', storedUnityId); // Para compatibilidade com monitoramento
+            sessionStorage.setItem('unity_id', storedUnityId); // Para sessão
+            window.currentUnityId = storedUnityId; // Global para módulos
             setTimeout(() => this.loadUnityProfile(storedUnityId), 500);
         } else {
             window.location.href = 'login.html';
@@ -1856,18 +1862,31 @@ const UnityDashboard = {
     
     // Monitoramento Real Time Content
     loadMonitoringContent(data) {
-        document.getElementById('monitoring-content').innerHTML = `
-            <div class="unity-card">
-                <h3 style="color: var(--secondary-green); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="fas fa-satellite-dish"></i> Monitoramento em Tempo Real
-                </h3>
-                <div style="text-align: center; padding: 3rem; background: var(--gray-50); border-radius: 12px;">
-                    <i class="fas fa-broadcast-tower" style="font-size: 3rem; color: var(--secondary-green); margin-bottom: 1rem;"></i>
-                    <h4 style="color: var(--gray-800); margin-bottom: 0.5rem;">Sistema em Desenvolvimento</h4>
-                    <p style="color: var(--gray-600);">Monitoramento de sensores IoT em tempo real será implementado em breve.</p>
+        console.log('Carregando seção de monitoramento...');
+        console.log('MonitoringModule disponível:', typeof MonitoringModule !== 'undefined');
+        
+        // Usar o módulo de monitoramento
+        if (typeof MonitoringModule !== 'undefined') {
+            console.log('Inicializando MonitoringModule...');
+            MonitoringModule.init();
+        } else {
+            console.error('MonitoringModule não encontrado!');
+            document.getElementById('monitoring-content').innerHTML = `
+                <div class="unity-card">
+                    <h3 style="color: var(--secondary-green); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-satellite-dish"></i> Monitoramento em Tempo Real
+                    </h3>
+                    <div style="text-align: center; padding: 3rem; background: var(--gray-50); border-radius: 12px;">
+                        <i class="fas fa-broadcast-tower" style="font-size: 3rem; color: var(--secondary-green); margin-bottom: 1rem;"></i>
+                        <h4 style="color: var(--gray-800); margin-bottom: 0.5rem;">Módulo não carregado</h4>
+                        <p style="color: var(--gray-600);">Erro ao carregar o módulo de monitoramento.</p>
+                        <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--secondary-green); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            <i class="fas fa-redo"></i> Recarregar Página
+                        </button>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
     },
     
     // Criar mapa de calor funcional

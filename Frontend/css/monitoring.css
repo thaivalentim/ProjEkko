@@ -1,0 +1,245 @@
+/* Monitoramento Real Time - CSS Modular */
+
+.monitoring-container {
+    padding: 2rem;
+    background: var(--gray-50);
+    min-height: 100vh;
+}
+
+.monitoring-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.control-label {
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+.control-select {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--gray-200);
+    border-radius: 8px;
+    background: white;
+    font-size: 0.9rem;
+    min-width: 180px;
+}
+
+.control-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-update {
+    background: var(--secondary-green);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-export {
+    background: var(--tech-blue);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 1200px) {
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.metric-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.metric-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.metric-icon.green { background: var(--secondary-green); }
+.metric-icon.orange { background: var(--orange); }
+.metric-icon.blue { background: var(--tech-blue); }
+.metric-icon.purple { background: var(--purple); }
+
+.metric-content h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+    color: var(--gray-800);
+}
+
+.metric-label {
+    color: var(--gray-600);
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.metric-status {
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.metric-status.green { color: var(--secondary-green); }
+.metric-status.orange { color: var(--orange); }
+.metric-status.blue { color: var(--tech-blue); }
+.metric-status.purple { color: var(--purple); }
+
+.data-table-container {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.table-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.table-info {
+    color: var(--gray-500);
+    font-size: 0.9rem;
+}
+
+.monitoring-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.monitoring-table th {
+    background: var(--gray-50);
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--gray-700);
+    border-bottom: 1px solid var(--gray-200);
+    font-size: 0.9rem;
+}
+
+.monitoring-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-100);
+    color: var(--gray-700);
+}
+
+.monitoring-table tbody tr:hover {
+    background: var(--gray-50);
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.status-ideal {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--secondary-green);
+}
+
+.status-atencao {
+    background: rgba(249, 115, 22, 0.1);
+    color: var(--orange);
+}
+
+.status-critico {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--red);
+}
+
+@media (max-width: 768px) {
+    .monitoring-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .control-group {
+        justify-content: space-between;
+    }
+    
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .monitoring-table {
+        font-size: 0.8rem;
+    }
+    
+    .monitoring-table th,
+    .monitoring-table td {
+        padding: 0.5rem;
+    }
+}
