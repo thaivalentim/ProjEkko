@@ -116,23 +116,38 @@ const UnityDashboard = {
         const playerActions = soilData.player_actions || {};
 
         document.getElementById('dashboard-content').innerHTML = `
-            <!-- Hero Section -->
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 3rem 2rem; margin-bottom: 2rem; color: white; text-align: center; position: relative; overflow: hidden;">
-                <!-- Background Pattern -->
-                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events: none;"></div>
-                
-                <div style="position: relative; z-index: 1;">
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem;">
-                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 50%; backdrop-filter: blur(10px);">
-                            <i class="fas fa-seedling" style="font-size: 2.5rem; color: #4ade80;"></i>
-                        </div>
-                        <h1 style="margin: 0; font-size: 2.5rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Bem-vindo ao website Ekko!</h1>
-                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 50%; backdrop-filter: blur(10px);">
-                            <i class="fas fa-gamepad" style="font-size: 2.5rem; color: #60a5fa;"></i>
-                        </div>
+            <!-- Welcome Section -->
+            <div style="background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); border-radius: 24px; padding: 3rem; margin-bottom: 2rem; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08);">
+                <div style="display: grid; grid-template-columns: 400px 1fr; gap: 3rem; align-items: center;">
+                    <!-- Imagem à Esquerda -->
+                    <div style="position: relative; display: flex; justify-content: center; align-items: center;">
+                        <img src="../assets/images/inicio.jpg" alt="Bem-vindo ao Ekko" style="width: 100%; max-width: 350px; height: auto; border-radius: 20px; box-shadow: 0 20px 40px rgba(5, 150, 105, 0.15); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-5px) scale(1.02)'; this.style.boxShadow='0 25px 50px rgba(5, 150, 105, 0.25)'" onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 20px 40px rgba(5, 150, 105, 0.15)'">
+                        <div style="position: absolute; top: -15px; left: -15px; right: -15px; bottom: -15px; background: linear-gradient(135deg, rgba(5, 150, 105, 0.1), rgba(59, 130, 246, 0.1)); border-radius: 28px; z-index: -1;"></div>
                     </div>
                     
-                    <p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.95; max-width: 700px; margin-left: auto; margin-right: auto;">Aqui, você pode monitorar tanto os dados da sua simulação com os sensores da Unity quanto as análises feitas a partir deles.</p>
+                    <!-- Texto à Direita -->
+                    <div style="padding-left: 2rem;">
+                        <h1 style="font-family: 'Playfair Display', 'Georgia', serif; font-size: 3.5rem; font-weight: 300; color: #1a202c; margin-bottom: 1rem; line-height: 1.1; letter-spacing: -0.02em;">Bem-vindo ao EKKO</h1>
+                        
+                        <p style="font-family: 'Inter', sans-serif; font-size: 1.3rem; font-weight: 500; color: var(--secondary-green); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.1em;">Agricultura Inteligente e Sustentável</p>
+                        
+                        <p style="font-family: 'Inter', sans-serif; font-size: 1.1rem; line-height: 1.7; color: var(--gray-600); margin-bottom: 2rem;">Aqui, você pode monitorar tanto os dados da sua simulação com os sensores da Unity quanto as análises feitas a partir deles. Descubra como a tecnologia pode transformar a agricultura através da gamificação e inteligência artificial.</p>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid rgba(5, 150, 105, 0.1); transition: all 0.3s ease;" onmouseover="this.style.paddingLeft='1rem'; this.style.background='rgba(5, 150, 105, 0.05)'; this.style.borderRadius='8px'; this.style.borderBottomColor='transparent'" onmouseout="this.style.paddingLeft='0'; this.style.background='transparent'; this.style.borderRadius='0'; this.style.borderBottomColor='rgba(5, 150, 105, 0.1)'">
+                                <i class="fas fa-seedling" style="font-size: 1.3rem; color: var(--secondary-green); width: 20px; text-align: center;"></i>
+                                <span style="font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 500; color: var(--gray-700);">Agricultura de Precisão</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid rgba(5, 150, 105, 0.1); transition: all 0.3s ease;" onmouseover="this.style.paddingLeft='1rem'; this.style.background='rgba(5, 150, 105, 0.05)'; this.style.borderRadius='8px'; this.style.borderBottomColor='transparent'" onmouseout="this.style.paddingLeft='0'; this.style.background='transparent'; this.style.borderRadius='0'; this.style.borderBottomColor='rgba(5, 150, 105, 0.1)'">
+                                <i class="fas fa-brain" style="font-size: 1.3rem; color: var(--secondary-green); width: 20px; text-align: center;"></i>
+                                <span style="font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 500; color: var(--gray-700);">Inteligência Artificial</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem 0; transition: all 0.3s ease;" onmouseover="this.style.paddingLeft='1rem'; this.style.background='rgba(5, 150, 105, 0.05)'; this.style.borderRadius='8px'" onmouseout="this.style.paddingLeft='0'; this.style.background='transparent'; this.style.borderRadius='0'">
+                                <i class="fas fa-hands-helping" style="font-size: 1.3rem; color: var(--secondary-green); width: 20px; text-align: center;"></i>
+                                <span style="font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 500; color: var(--gray-700);">Fraternidade e Ecologia</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
