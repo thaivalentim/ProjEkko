@@ -140,7 +140,7 @@ const UnityDashboard = {
                             </div>
                             <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid rgba(5, 150, 105, 0.1); transition: all 0.3s ease;" onmouseover="this.style.paddingLeft='1rem'; this.style.background='rgba(5, 150, 105, 0.05)'; this.style.borderRadius='8px'; this.style.borderBottomColor='transparent'" onmouseout="this.style.paddingLeft='0'; this.style.background='transparent'; this.style.borderRadius='0'; this.style.borderBottomColor='rgba(5, 150, 105, 0.1)'">
                                 <i class="fas fa-brain" style="font-size: 1.3rem; color: var(--secondary-green); width: 20px; text-align: center;"></i>
-                                <span style="font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 500; color: var(--gray-700);">Inteligência Artificial</span>
+                                <span style="font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 500; color: var(--gray-700);">Inovação Tecnológica</span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem 0; transition: all 0.3s ease;" onmouseover="this.style.paddingLeft='1rem'; this.style.background='rgba(5, 150, 105, 0.05)'; this.style.borderRadius='8px'" onmouseout="this.style.paddingLeft='0'; this.style.background='transparent'; this.style.borderRadius='0'">
                                 <i class="fas fa-hands-helping" style="font-size: 1.3rem; color: var(--secondary-green); width: 20px; text-align: center;"></i>
@@ -152,27 +152,47 @@ const UnityDashboard = {
             </div>
             
             <!-- About Section -->
-            <div class="unity-card" style="margin-bottom: 2rem; background: var(--white); border: none; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 16px;">
-                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; align-items: center;">
-                    <!-- Left Side - Visual -->
-                    <div style="text-align: center; padding: 2rem;">
-                        <div style="background: linear-gradient(135deg, var(--secondary-green), var(--primary-green)); width: 120px; height: 120px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);">
-                            <i class="fas fa-leaf" style="font-size: 3rem; color: white;"></i>
-                        </div>
-                        <h3 style="color: var(--gray-800); margin-bottom: 0.5rem; font-size: 1.3rem;">Projeto Sustentável</h3>
-                        <p style="color: var(--gray-600); font-size: 0.9rem;">Tecnologia a serviço do meio ambiente</p>
+            <div class="unity-card" style="margin-bottom: 2rem; background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: none; box-shadow: 0 20px 40px rgba(0,0,0,0.08); border-radius: 24px; overflow: hidden; position: relative;">
+                <!-- Background Pattern -->
+                <div style="position: absolute; top: 0; right: 0; width: 200px; height: 200px; background: linear-gradient(135deg, rgba(34, 197, 94, 0.03), rgba(59, 130, 246, 0.03)); border-radius: 50%; transform: translate(50px, -50px);"></div>
+                
+                <div style="position: relative; z-index: 2; padding: 3rem;">
+                    <!-- Header -->
+                    <div style="text-align: center; margin-bottom: 3rem;">
+                        <h2 style="font-family: 'Playfair Display', 'Georgia', serif; color: var(--gray-800); margin: 0; font-size: 3.5rem; font-weight: 300; letter-spacing: -0.02em;">Sobre o Ekko</h2>
                     </div>
                     
-                    <!-- Right Side - Content -->
-                    <div style="padding: 1rem;">
-                        <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05)); padding: 1.5rem; border-radius: 12px; border-left: 4px solid #667eea; margin-bottom: 1.5rem;">
-                            <p style="color: var(--gray-700); line-height: 1.7; margin: 0; font-size: 1rem;">Ekko é um projeto desenvolvido pela <strong style="color: var(--tech-blue);">equipe 34DS08</strong>, do curso Desenvolvimento de Sistemas, para a <strong style="color: var(--purple);">44ª Projete</strong>, a feira tecnológica da ETE FMC. Em 2025, o tema da feira engloba a promoção da <strong style="color: var(--secondary-green);">sustentabilidade</strong>, que é um dos objetivos principais do Ekko: auxiliar agricultores e autônomos a cuidarem do meio ambiente por meio da tecnologia.</p>
+                    <!-- Content Cards -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <!-- Card 1: Projeto -->
+                        <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 4px solid var(--tech-blue); transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                                <div style="background: linear-gradient(135deg, var(--tech-blue), #60A5FA); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-graduation-cap" style="color: white; font-size: 1.3rem;"></i>
+                                </div>
+                                <div>
+                                    <h3 style="color: var(--gray-800); margin: 0; font-size: 1.2rem; font-weight: 600;">O Projeto</h3>
+                                    <p style="color: var(--gray-500); margin: 0; font-size: 0.9rem;">44ª Projete ETE FMC</p>
+                                </div>
+                            </div>
+                            <p style="color: var(--gray-700); line-height: 1.7; margin: 0; font-size: 1rem;">Desenvolvido pela <strong style="color: var(--tech-blue);">equipe 34DS08</strong> do curso Desenvolvimento de Sistemas para a <strong style="color: var(--purple);">44ª Projete</strong> da ETE FMC. O tema de 2025 foca na <strong style="color: var(--secondary-green);">sustentabilidade</strong>, objetivo principal do Ekko: auxiliar agricultores através da tecnologia.</p>
                         </div>
                         
-                        <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.05), rgba(16, 185, 129, 0.05)); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--secondary-green);">
-                            <p style="color: var(--gray-700); line-height: 1.7; margin: 0; font-size: 1rem;">Ele contempla soluções principalmente de software: por meio de uma <strong style="color: var(--orange);">simulação gamificada</strong>, desenvolvida na plataforma Unity, o jogador aprende a manusear um dispositivo móvel que controla diversos sensores, coletando continuamente informações de inúmeros parâmetros do solo, como <strong style="color: var(--tech-blue);">pH, umidade, temperatura e nutrientes</strong>. Os dados dessa simulação são comunicados com este website, no qual o usuário tem acesso à <strong style="color: var(--purple);">Inteligência Artificial, gráficos e estatísticas</strong>.</p>
+                        <!-- Card 2: Tecnologia -->
+                        <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 4px solid var(--secondary-green); transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                                <div style="background: linear-gradient(135deg, var(--secondary-green), var(--primary-green)); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-cogs" style="color: white; font-size: 1.3rem;"></i>
+                                </div>
+                                <div>
+                                    <h3 style="color: var(--gray-800); margin: 0; font-size: 1.2rem; font-weight: 600;">Como Funciona</h3>
+                                    <p style="color: var(--gray-500); margin: 0; font-size: 0.9rem;">Unity + IA + Dashboard</p>
+                                </div>
+                            </div>
+                            <p style="color: var(--gray-700); line-height: 1.7; margin: 0; font-size: 1rem;">Através de uma <strong style="color: var(--orange);">simulação gamificada</strong> na Unity, o jogador controla sensores virtuais coletando dados de <strong style="color: var(--tech-blue);">pH, umidade, temperatura e nutrientes</strong> do solo. Os dados são processados neste website com <strong style="color: var(--purple);">IA, gráficos e estatísticas</strong> avançadas.</p>
                         </div>
                     </div>
+
                 </div>
             </div>
                 
