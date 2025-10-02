@@ -609,7 +609,7 @@ const MonitoringModule = {
         
         // Salvar arquivo com nome mais profissional
         const timestamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
-        const fileName = `EKKO_Relatorio_Monitoramento_${timestamp}_${unityId.substring(0, 8)}.pdf`;
+        const fileName = `RelatorioMonitoramento_Ekko_${timestamp}.pdf`;
         doc.save(fileName);
         
         // Feedback visual
