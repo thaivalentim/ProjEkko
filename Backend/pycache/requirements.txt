@@ -1,83 +1,27 @@
-# EKKO - Dependências Python
-# Instalar com: pip install -r requirements.txt
-
-# --- Core do Servidor Web e API (Stack Flask) ---
-
-Flask                   
-# Um micro-framework WSGI (Web Server Gateway Interface) para a construção do endpoint da API. Lida com o roteamento HTTP, o ciclo de vida de requisição/resposta e a renderização de templates.
-
-Flask-Cors              
-# Uma extensão do Flask para gerir o CORS (Cross-Origin Resource Sharing), adicionando os cabeçalhos HTTP necessários para permitir requisições de origens diferentes (ex: o frontend em JavaScript).
-
-# --- Comunicação HTTP e Parsing ---
-
-requests                
-# Biblioteca padrão de facto para a realização de requisições HTTP em Python. Utilizada para comunicar com APIs externas como a do INMET e OpenStreetMap.
-
-beautifulsoup4          
-# Biblioteca para parsing de documentos HTML e XML. Utilizada na ferramenta "Leitor de Páginas" para extrair e sanear o conteúdo textual do DOM de páginas web.
-
-# --- Inteligência Artificial e Machine Learning ---
-
-google-generativeai     
-# SDK oficial do Google para interagir com a API de Modelos Generativos (LLMs da família Gemini), gerindo a autenticação e a comunicação com os endpoints do modelo.
-
-sentence-transformers  
-# Framework baseado em PyTorch/TensorFlow para a geração de embeddings de frases de alta densidade e semanticamente ricas. Utilizado no pipeline RAG.
-
-faiss-cpu               
-# Biblioteca de alta performance desenvolvida pelo Facebook (Meta AI) para busca de similaridade eficiente em vetores de grande dimensão. Implementa o índice para a busca vetorial (ANN - Approximate Nearest Neighbor).
-
-ddgs                    
-# Uma biblioteca cliente (wrapper) para executar buscas programáticas no motor de busca DuckDuckGo, permitindo a utilização de operadores avançados como `site:`.
-
-# --- Computação Numérica ---
-
-numpy                   
-# Biblioteca fundamental para computação científica em Python, fornecendo suporte para arrays e matrizes multidimensionais. É uma dependência crítica do FAISS para a manipulação de vetores.
-
-# --- Utilitários Padrão ---
-
-python-dotenv           
-# Utilizada para carregar variáveis de ambiente de um arquivo `.env` para o runtime do processo (via `os.getenv`), uma prática de segurança essencial da metodologia "Twelve-Factor App".
-
-datetime                
-# (Nativo do Python) Módulo para manipulação de objetos de data e hora, utilizado para o parsing e formatação das datas retornadas pelas APIs de clima.
+#siga esse caminho para instalar as bibliotecas
+# cd Backend/pycache
+# copie isso e cole do terminal
+#pip install -r requirements.txt
 
 
+# Framework e Servidor
+fastapi
+uvicorn[standard]
 
-# --- Framework de API Assíncrono ---
+# Banco de Dados
+pymongo
+python-dotenv
 
-fastapi==0.104.1            
-# Um framework ASGI (Asynchronous Server Gateway Interface) moderno e de alta performance para a construção de APIs, com validação de dados nativa via Pydantic e documentação automática (Swagger/OpenAPI).
+# IA (Stack Local - Ollama) e Busca
+requests
+ddgs
+sentence-transformers
+faiss-cpu
 
-uvicorn[standard]==0.24.0   
-# Um servidor ASGI de alta velocidade, necessário para executar aplicações FastAPI em produção.
+# Utilitários
+pydantic
+numpy
+datetime
+beautifulsoup4
+python-multipart
 
-# --- Stack Alternativo: Banco de Dados NoSQL ---
-
-pymongo==4.6.0               
-# O driver oficial para a interação com o MongoDB, um banco de dados orientado a documentos (NoSQL), ideal para o armazenamento de dados não estruturados ou semiestruturados (JSON-like).
-
-# --- Ecossistema FastAPI e Validação ---
-
-pydantic==2.5.0              
-# Biblioteca para parsing e validação de dados em Python, utilizando type hints. É o núcleo do sistema de serialização/deserialização do FastAPI.
-
-python-multipart==0.0.6      
-# Necessário para que o FastAPI possa processar dados de formulários `multipart/form-data`, como o upload de arquivos.
-
-# --- Ferramentas de Teste e Desenvolvimento ---
-
-faker==20.1.0                
-# Biblioteca para a geração de dados "mock" (falsos), utilizada para popular bancos de dados para fins de teste e desenvolvimento.
-
-# --- Comunicação em Tempo Real  ---
-
-websockets==12.0             
-# Uma implementação do protocolo WebSocket, que permite uma comunicação full-duplex (bidirecional) e persistente entre cliente e servidor, ideal para aplicações de chat de altíssima performance.
-
-# --- Logging Estruturado ---
-
-python-json-logger==2.0.7   
-# Uma biblioteca de logging que formata as saídas de log como objetos JSON estruturados, facilitando a ingestão, a busca e a análise por plataformas de monitorização centralizada (ex: ELK Stack, Datadog).

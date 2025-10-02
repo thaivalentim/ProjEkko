@@ -1,8 +1,8 @@
 # Arquivo: tools.py
+
 import sqlite3
 import requests
 import math
-import requests
 import json
 import os
 import faiss
@@ -10,25 +10,29 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 from ddgs import DDGS
 from datetime import datetime
-from bs4 import BeautifulSoup
 
-# --- CONFIGURAÇÃO DA BUSCA LOCAL ---
+# --- CONFIGURAÇÃO DA BUSCA LOCAL (RAG) ---
+# Tenta carregar o modelo de embeddings. Se falhar, a busca local será desativada.
 try:
     print("-> Carregando modelo de embeddings para busca local...")
     embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
-    print("-> Modelo de embeddings carregado.")
+    print("-> Modelo de embeddings carregado com sucesso.")
 except Exception as e:
-    print(f"!!! ERRO ao carregar modelo de embeddings: {e}")
+    print(f"!!! ERRO ao carregar modelo de embeddings: {e}. A busca local estará desativada.")
     embedding_model = None
 
-doc_path = "dados_plantacoes"
+doc_path = "data/dados_plantacoes" 
 documents = []
 index = None
 
 def load_and_index_local_database():
+    """
+    Lê todos os ficheiros .txt da pasta dados_plantacoes, cria os vetores (embeddings)
+    e indexa-os usando FAISS para busca rápida. É chamada na inicialização do servidor.
+    """
     global documents, index
     if not (os.path.exists(doc_path) and embedding_model):
-        print("-> AVISO: Pasta 'dados_plantacoes' não encontrada ou modelo de embeddings não carregado. A busca local estará desativada.")
+        print("-> AVISO: Busca local desativada. Pasta 'dados_plantacoes' não encontrada ou vazia.")
         return
 
     print("-> Lendo e indexando a base de conhecimento local...")
@@ -45,30 +49,38 @@ def load_and_index_local_database():
         index.add(np.array(doc_embeddings, dtype=np.float32))
         print(f"-> Indexação de {len(documents)} documentos locais concluída!")
 
-# --- A CAIXA DE FERRAMENTAS DO AGENTE EKKO ---
+# ======================================================
+#  A CAIXA DE FERRAMENTAS DO AGENTE EKKO
+# ======================================================
 
 def local_database_search(query: str) -> str:
-    print(f"--- Ferramenta: Busca na Base de Dados Local -> '{query}' ---")
+    """Ferramenta para buscar na base de conhecimento local (ficheiros .txt)."""
+    print(f"--- Ferramenta Acionada: Busca na Base de Dados Local para '{query}' ---")
     if index is None or not documents:
         return "A base de dados local não está ativa ou está vazia."
     
     query_embedding = embedding_model.encode([query])
+    # Busca os 3 trechos mais relevantes da biblioteca
     _, indices = index.search(np.array(query_embedding, dtype=np.float32), 3)
     
-    return "Resultados da busca na base de dados local:\n" + "\n---\n".join([documents[i] for i in indices[0]])
+    context = "\n---\n".join([documents[i] for i in indices[0]])
+    return f"Resultados da busca na base de dados local:\n{context}"
 
 def save_memory(information: str) -> str:
-    print(f"--- Ferramenta: Gravar na Memória -> '{information}' ---")
+    """Ferramenta para salvar um fato na memória de longo prazo (SQLite)."""
+    print(f"--- Ferramenta Acionada: Gravar na Memória -> '{information}' ---")
     try:
         conn = sqlite3.connect("ekko_memory.db")
         cursor = conn.cursor()
         cursor.execute("INSERT OR IGNORE INTO memories (content) VALUES (?)", (information,))
         conn.commit()
         conn.close()
-        return f"Anotado. A informação '{information}' foi guardada."
-    except Exception as e: return f"Erro ao guardar informação: {e}"
+        return f"Anotado. A informação '{information}' foi guardada na minha memória."
+    except Exception as e:
+        return f"Erro ao tentar guardar a informação: {e}"
 
 def recall_memories() -> str:
+    """Função auxiliar para ler todas as memórias salvas."""
     try:
         conn = sqlite3.connect("ekko_memory.db")
         cursor = conn.cursor()
@@ -76,11 +88,13 @@ def recall_memories() -> str:
         memories = [row[0] for row in cursor.fetchall()]
         conn.close()
         if not memories: return "Nenhuma memória de longo prazo encontrada."
-        return "Memórias de Longo Prazo:\n- " + "\n- ".join(memories)
-    except Exception as e: return f"Erro ao aceder às memórias: {e}"
+        return "Memórias de Longo Prazo (Fatos sobre o usuário):\n- " + "\n- ".join(memories)
+    except Exception as e:
+        return f"Erro ao aceder às memórias: {e}"
 
 def focused_web_search(query: str, location_string: str = "") -> str:
-    print(f"--- Ferramenta: Busca na Web -> '{query}' em '{location_string}' ---")
+    """Ferramenta para buscar na web, restrita a fontes confiáveis."""
+    print(f"--- Ferramenta Acionada: Busca na Web -> '{query}' em '{location_string}' ---")
     trusted_sources = ["site:embrapa.br", "site:epamig.br", "site:noticiasagricolas.com.br", "site:canalrural.com.br", "site:globorural.globo.com", "site:cepea.esalq.usp.br"]
     full_query = f"{query} {location_string}"
     search_query = f"{full_query} ({' OR '.join(trusted_sources)})"
@@ -92,18 +106,24 @@ def focused_web_search(query: str, location_string: str = "") -> str:
         for result in results:
             context_web += f"- Trecho: '{result.get('body', '')}' [Fonte: {result.get('href', '')}]\n"
         return context_web
-    except Exception as e: return f"Erro ao buscar na web: {e}"
+    except Exception as e:
+        return f"Erro ao buscar na web: {e}"
 
+# --- FERRAMENTAS DE CLIMA E LOCALIZAÇÃO ---
 INMET_STATIONS = []
+STATIONS_FILE = "data/estacoes_inmet.json"
 def load_inmet_stations():
+    """Carrega o 'mapa' de estações do INMET do ficheiro JSON local."""
     global INMET_STATIONS
     try:
-        with open("..\Documentos\GitHub\ProjEkko\Backend\estacoes_inmet.json", 'r', encoding='utf-8') as f:
+        with open(STATIONS_FILE, 'r', encoding='utf-8') as f:
             INMET_STATIONS = json.load(f)
         print(f"-> {len(INMET_STATIONS)} estações do INMET carregadas.")
-    except Exception as e: print(f"!!! ERRO ao carregar estações do INMET: {e}")
+    except Exception as e:
+        print(f"!!! ERRO ao carregar estações do INMET: {e}")
 
 def find_closest_station(user_lat, user_lon):
+    """Encontra a estação do INMET mais próxima usando a Fórmula de Haversine."""
     if not INMET_STATIONS: return None
     def haversine(lat1, lon1, lat2, lon2):
         R = 6371
@@ -113,7 +133,8 @@ def find_closest_station(user_lat, user_lon):
     return min(INMET_STATIONS, key=lambda s: haversine(user_lat, user_lon, float(s['VL_LATITUDE']), float(s['VL_LONGITUDE'])))
 
 def get_inmet_forecast(lat: float, lon: float) -> str:
-    print(f"--- Ferramenta: Previsão do Tempo INMET -> ({lat}, {lon}) ---")
+    """Ferramenta para obter a previsão do tempo oficial do INMET para uma localização."""
+    print(f"--- Ferramenta Acionada: Previsão do Tempo INMET -> ({lat}, {lon}) ---")
     closest_station = find_closest_station(lat, lon)
     if not closest_station: return "Não foi possível encontrar a estação do INMET mais próxima."
     
@@ -132,10 +153,12 @@ def get_inmet_forecast(lat: float, lon: float) -> str:
             date_str = datetime.strptime(day, '%d/%m/%Y').strftime('%d/%m (%a)')
             forecast_text += f"**{date_str}**: {day_data['resumo']}\n - Temp.: **{day_data['temp_min']}°C** / **{day_data['temp_max']}°C**\n"
         return forecast_text
-    except Exception as e: return f"Erro ao obter a previsão do tempo do INMET: {e}"
+    except Exception as e:
+        return f"Erro ao obter a previsão do tempo do INMET: {e}"
 
 def init_memory_db():
-    conn = sqlite3.connect("ekko_memory.db")
+    """Cria a tabela de memória na base de dados se ela não existir."""
+    conn = sqlite3.connect("data/ekko_memory.db")
     cursor = conn.cursor()
     cursor.execute('CREATE TABLE IF NOT EXISTS memories (id INTEGER PRIMARY KEY, content TEXT NOT NULL UNIQUE)')
     conn.commit()
@@ -143,7 +166,8 @@ def init_memory_db():
     print("-> Base de dados de memória iniciada.")
 
 def get_location_name(lat: float, lon: float) -> str:
-    print(f"--- Ferramenta: Geocodificação Reversa -> ({lat}, {lon}) ---")
+    """Ferramenta para converter coordenadas em nome de local (cidade, estado)."""
+    print(f"--- Ferramenta Acionada: Geocodificação Reversa -> ({lat}, {lon}) ---")
     try:
         url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}"
         headers = {'User-Agent': 'EkkoเกษตรกรAssistant/1.0'}
@@ -156,3 +180,6 @@ def get_location_name(lat: float, lon: float) -> str:
     except Exception as e:
         print(f"ERRO na geocodificação reversa: {e}")
         return ""
+    
+
+    

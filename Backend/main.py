@@ -3,13 +3,24 @@ EKKO - API Principal
 FastAPI com MongoDB Atlas
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
+from pymongo import MongoClient
+from dotenv import load_dotenv
 import uuid
 import uvicorn
+import os
+
+# Imports adicionados para o Ekko
+import requests
+import json
+import re
+import random
+import tool  # O nosso arquivo tools.py
+import prompts # O nosso arquivo prompts.py
 
 
 # Imports locais
@@ -325,3 +336,107 @@ if __name__ == "__main__":
     print("=" * 50)
     
     uvicorn.run(app, host=API_HOST, port=API_PORT, reload=API_DEBUG)
+
+
+# ==============================================================================
+# ==============================================================================
+# ==                                                                          ==
+# ==                   INÍCIO DO CÓDIGO DO CHATBOT EKKO                       ==
+# ==                                                                          ==
+# ==============================================================================
+# ==============================================================================
+
+# --- CONFIGURAÇÃO E INICIALIZAÇÃO DO EKKO ---
+
+# Conexão com a IA Local (Ollama)
+OLLAMA_API_URL = "http://localhost:11434/api/generate"
+
+# Evento que executa as inicializações do Ekko quando o servidor FastAPI liga
+@app.on_event("startup")
+def startup_event_ekko():
+    """Funções a serem executadas quando o servidor inicia."""
+    tool.init_memory_db()
+    tool.load_inmet_stations()
+    tool.load_and_index_local_database()
+    print("="*50)
+    print("Módulos do Chatbot Ekko carregados com sucesso.")
+    print("="*50)
+
+# Novo modelo Pydantic para as requisições do chat
+class ChatRequest(BaseModel):
+    message: str
+    history: Optional[list] = []
+    coordinates: Optional[Dict[str, float]] = None
+
+# --- FUNÇÃO DE COMUNICAÇÃO COM OLLAMA ---
+def get_ollama_response_stream(prompt: str):
+    """
+    Função de baixo nível para enviar um prompt para o Llama 3 local e receber a resposta em tempo real (streaming).
+    """
+    try:
+        # Formato de prompt específico para o Llama 3 para melhores resultados
+        llama3_prompt = f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nVocê é Ekko, um assistente de IA especialista em agricultura.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>"
+        payload = {"model": "llama3", "prompt": llama3_prompt, "stream": True}
+        
+        response = requests.post(OLLAMA_API_URL, json=payload, stream=True)
+        response.raise_for_status()
+
+        for chunk in response.iter_lines():
+            if chunk:
+                json_chunk = json.loads(chunk)
+                # Envia um evento formatado para o frontend
+                yield f'data: {json.dumps({"type": "chunk", "message": json_chunk.get("response", "")})}\n\n'
+    except Exception as e:
+        print(f"!!! ERRO no streaming com Ollama: {e}")
+        yield f'data: {json.dumps({"type": "chunk", "message": "Ops, erro de comunicação com a IA local (Ollama)."})}\n\n'
+
+# --- NOVO ENDPOINT: O CÉREBRO DO CHATBOT EKKO ---
+@app.post("/api/chat/{unity_id}")
+def chat(unity_id: str, request: ChatRequest):
+    """
+    Endpoint principal do chatbot Ekko. Recebe uma pergunta, busca contexto no MongoDB
+    e usa o Agente de IA para gerar uma resposta.
+    """
+    user_message = request.message
+    coordinates = request.coordinates
+    formatted_history = "\n".join(request.history)
+    
+    latest_soil = unity_soil_data.find_one({"unity_id": unity_id}, sort=[("timestamp", -1)])
+    contexto_do_jogador = f"Dados do solo mais recentes do jogador: {json.dumps(latest_soil, default=str)}" if latest_soil else "Nenhum dado de solo recente encontrado para este jogador."
+
+    def stream_generation():
+        try:
+      
+            status_message = "Analisando sua pergunta e buscando dados..."
+            yield f'data: {json.dumps({"type": "status", "message": status_message})}\n\n'
+
+            local_context = tool.local_database_search(user_message)
+            web_context = tool.focused_web_search(user_message)
+            weather_context = ""
+            weather_keywords = ["clima", "tempo", "chuva", "geada", "temperatura", "previsão"]
+            if coordinates and any(keyword in user_message.lower() for keyword in weather_keywords):
+                weather_context = tool.get_inmet_forecast(lat=coordinates['latitude'], lon=coordinates['longitude'])
+            
+            long_term_memory = tool.recall_memories()
+
+            final_prompt = prompts.MASTER_PROMPT.format(
+                long_term_memory=long_term_memory,
+                local_context=local_context + "\n\n" + contexto_do_jogador,
+                web_context=web_context,
+                weather_context=weather_context,
+                history=formatted_history,
+                user_message=user_message
+            )
+
+    
+            yield from get_ollama_response_stream(final_prompt)
+
+        except Exception as e:
+            print(f"!!! ERRO CRÍTICO NO FLUXO DE CHAT: {e}")
+            yield f'data: {json.dumps({"type": "chunk", "message": "Ocorreu um erro crítico no meu processamento."})}\n\n'
+
+    return Response(stream_generation(), mimetype='text/event-stream')
+
+
+
+
