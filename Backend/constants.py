@@ -49,4 +49,3 @@ MESSAGES = {
         STATUS_CRITICO: "Solo salino - prejudica absorção"
     }
 }
-

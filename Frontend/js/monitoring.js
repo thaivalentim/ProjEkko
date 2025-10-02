@@ -151,14 +151,14 @@ const MonitoringModule = {
             </div>
             
             <div class="metric-card">
-                <div class="metric-icon ${hasData && metrics.alertas > 0 ? 'orange' : 'gray'}">
+                <div class="metric-icon ${hasData ? (metrics.alertas > 0 ? 'orange' : 'green') : 'gray'}">
                     <i class="fas fa-exclamation-triangle"></i>
                 </div>
                 <div class="metric-content">
                     <h3>${metrics.alertas}</h3>
                     <div class="metric-label">Alertas Ativos</div>
                     <div class="metric-status ${hasData ? (metrics.alertas > 0 ? 'orange' : 'green') : 'gray'}">
-                        <i class="fas fa-${hasData ? (metrics.alertas > 0 ? 'exclamation' : 'check') : 'minus'}"></i> ${hasData ? (metrics.alertas > 0 ? 'Atenção' : 'OK') : 'Sem dados'}
+                        <i class="fas fa-${hasData ? (metrics.alertas > 0 ? 'exclamation-triangle' : 'check') : 'minus'}"></i> ${hasData ? (metrics.alertas > 0 ? 'Atenção' : 'OK') : 'Sem dados'}
                     </div>
                 </div>
             </div>
@@ -361,7 +361,7 @@ const MonitoringModule = {
                     console.log('Dados carregados com sucesso:', this.realData.length, 'registros');
                 } else {
                     this.realData = [];
-                    console.warn('Nenhum dado encontrado no banco de dados para Unity ID:', unityId);
+                    console.warn('Nenhum dado encontrado no banco de dados para o ID:', unityId);
                 }
             } else {
                 const errorText = await response.text();

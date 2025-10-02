@@ -114,6 +114,7 @@
 .metric-icon.orange { background: var(--orange); }
 .metric-icon.blue { background: var(--tech-blue); }
 .metric-icon.purple { background: var(--purple); }
+.metric-icon.gray { background: var(--gray-400); }
 
 .metric-content h3 {
     font-size: 2rem;
@@ -140,6 +141,7 @@
 .metric-status.orange { color: var(--orange); }
 .metric-status.blue { color: var(--tech-blue); }
 .metric-status.purple { color: var(--purple); }
+.metric-status.gray { color: var(--gray-500); }
 
 .data-table-container {
     background: white;

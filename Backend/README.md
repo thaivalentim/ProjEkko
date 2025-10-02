@@ -1,4 +1,4 @@
-# 🌱 EKKO Unity - Backend
+# 🌱 Ekko- Backend
 
 Sistema de IA avançado para análise de solo com integração Unity e MongoDB Atlas.
 

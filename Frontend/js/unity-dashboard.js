@@ -172,10 +172,10 @@ const UnityDashboard = {
                                 </div>
                                 <div>
                                     <h3 style="color: var(--gray-800); margin: 0; font-size: 1.2rem; font-weight: 600;">O Projeto</h3>
-                                    <p style="color: var(--gray-500); margin: 0; font-size: 0.9rem;">44ª Projete ETE FMC</p>
+                                    <p style="color: var(--gray-500); margin: 0; font-size: 0.9rem;">Fraternidade e ecologia integral</p>
                                 </div>
                             </div>
-                            <p style="color: var(--gray-700); line-height: 1.7; margin: 0; font-size: 1rem;">Desenvolvido pela <strong style="color: var(--tech-blue);">equipe 34DS08</strong> do curso Desenvolvimento de Sistemas para a <strong style="color: var(--purple);">44ª Projete</strong> da ETE FMC. O tema de 2025 foca na <strong style="color: var(--secondary-green);">sustentabilidade</strong>, objetivo principal do Ekko: auxiliar agricultores através da tecnologia.</p>
+                            <p style="color: var(--gray-700); line-height: 1.7; margin: 0; font-size: 1rem;">Desenvolvido pela <strong style="color: var(--tech-blue);">equipe 34DS08</strong> do curso Desenvolvimento de Sistemas para a <strong style="color: var(--purple);">45ª Projete</strong> da ETE FMC. O tema de 2025 foca na <strong style="color: var(--secondary-green);">sustentabilidade</strong>, objetivo principal do Ekko: auxiliar agricultores através da tecnologia.</p>
                         </div>
                         
                         <!-- Card 2: Tecnologia -->
@@ -245,7 +245,7 @@ const UnityDashboard = {
                             </div>
                             <h4 style="margin: 0; color: var(--gray-800); font-size: 1.1rem;">IA Avançada</h4>
                         </div>
-                        <p style="color: var(--gray-700); margin: 0; line-height: 1.5;">Análise inteligente de 9 parâmetros do solo com recomendações personalizadas em tempo real</p>
+                        <p style="color: var(--gray-700); margin: 0; line-height: 1.5;">Análise inteligente de 9 parâmetros do solo + Chatbot treinado com fontes renomadas do setor agrícola brasileiro</p>
                     </div>
                     
                     <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05)); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--tech-blue);">

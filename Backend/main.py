@@ -106,7 +106,7 @@ def create_profile(profile: UnityProfile):
     return {
         "status": "success",
         "unity_id": unity_id,
-        "message": "Perfil Unity criado no Atlas"
+        "message": "Perfil criado no Atlas"
     }
 
 @app.get("/unity/login/{unity_id}")
@@ -196,7 +196,7 @@ def get_dashboard(unity_id: str):
         sort=[("timestamp", -1)]
     )
     
-    # Buscar histórico de solo Unity para mapas
+    # Buscar histórico de solo para mapas
     soil_history = list(unity_soil_data.find(
         {"unity_id": unity_id}
     ).sort("timestamp", -1).limit(20))
@@ -317,7 +317,7 @@ def analise_ia(unity_id: str):
     }
 
 if __name__ == "__main__":
-    print("EKKO Unity API - MongoDB Atlas")
+    print("EKKO API - MongoDB Atlas")
     print(f"Banco: {DB_NAME}")
     print("Porta: 8002")
     print("Docs: http://127.0.0.1:8002/docs")
