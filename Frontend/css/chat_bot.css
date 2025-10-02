@@ -1,31 +1,33 @@
 /* ====================================================== */
-/* ESTILOS COMPLETOS PARA O MÓDULO DE CHAT EKKO V3.0      */
-/* Arquitetura: Sidebar de Histórico + Janela de Chat     */
+/* ESTILOS FINAIS E COMPLETOS PARA O MÓDULO DE CHAT       */
+/* Projeto Ekko - vFinal                                  */
+/* Arquitetura: Sidebar Retrátil + Janela de Chat         */
 /* ====================================================== */
 
 /* --- Container Principal --- */
-/* Esta é a `div` que envolve a sidebar e o chat, organizando-os lado a lado */
 .ekko-chat-wrapper {
     display: flex;
+    flex-direction: row; /* Garante a direção horizontal */
     height: 100%;
-    max-height: 75vh; /* Altura máxima do componente na página */
+    max-height: 75vh;
     width: 100%;
     background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
     overflow: hidden;
     border: 1px solid #e0e0e0;
 }
 
 /* --- SIDEBAR DE HISTÓRICO (ESQUERDA) --- */
 .history-sidebar {
-    width: 240px;
-    background-color: #f0f2f5;
-    border-right: 1px solid #ddd;
+    width: 250px;
+    background-color: #f7f9fa;
+    border-right: 1px solid #e7eaec;
     display: flex;
     flex-direction: column;
-    flex-shrink: 0; /* Impede que a sidebar encolha */
-    transition: width 0.3s ease; /* Para futuras animações de ocultar/mostrar */
+    flex-shrink: 0;
+    transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    overflow: hidden;
 }
 
 .sidebar-header {
@@ -33,7 +35,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #e7eaec;
     flex-shrink: 0;
 }
 
@@ -42,26 +44,27 @@
     font-size: 1.1em;
     color: #333;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 .new-session-btn {
-    padding: 8px 12px;
-    border: 1px dashed #999;
-    background-color: transparent;
-    border-radius: 18px;
-    cursor: pointer;
-    font-size: 0.85em;
+    border: none;
+    background-color: #e4e6eb;
     color: #555;
-    transition: all 0.2s ease;
+    border-radius: 50%;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
 }
 
 .new-session-btn:hover {
-    background-color: #e4e6eb;
+    background-color: #dcdfe2;
     color: #000;
-    border-style: solid;
 }
 
 .history-list {
@@ -70,34 +73,30 @@
     margin: 0;
     overflow-y: auto;
     flex-grow: 1;
+    white-space: nowrap;
 }
-/* Estilo da barra de rolagem da sidebar */
 .history-list::-webkit-scrollbar { width: 5px; }
 .history-list::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 10px; }
 
 .history-item {
-    padding: 12px 15px;
+    padding: 12px 20px;
     cursor: pointer;
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    border-bottom: 1px solid #e0e0e0;
     color: #333;
     font-size: 0.9em;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, border-left 0.2s ease;
+    border-left: 3px solid transparent;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
-
-.history-item:hover {
-    background-color: #e4e6eb;
-}
-
+.history-item:hover { background-color: #e4e6eb; }
 .history-item.active {
-    background-color: #27ae60; /* Cor verde do seu tema */
-    color: white;
-    font-weight: bold;
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    font-weight: 600;
+    border-left: 3px solid #27ae60;
 }
 
 .history-item .delete-session-btn {
@@ -109,25 +108,80 @@
     padding: 0 5px;
     line-height: 1;
     border-radius: 50%;
-    display: none; /* Só aparece no hover */
+    display: none;
 }
-.history-item:hover .delete-session-btn {
-    display: inline;
-}
-.history-item.active .delete-session-btn {
-    color: white;
-}
-.history-item .delete-session-btn:hover {
-    color: #e74c3c;
-    background-color: rgba(255,255,255,0.2);
+.history-item:hover .delete-session-btn { display: inline; }
+.history-item.active .delete-session-btn { color: #2e7d32; }
+.history-item .delete-session-btn:hover { color: #e74c3c; background-color: rgba(0,0,0,0.1); }
+
+/* --- COLUNA DE CONTROLO E LÓGICA RETRÁTIL --- */
+.sidebar-toggle {
+    flex-shrink: 0;
+    width: 20px;
+    background-color: #f0f2f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-right: 1px solid #e7eaec;
+    transition: border-color 0.4s ease;
 }
 
+.toggle-sidebar-btn {
+    border: none;
+    background-color: #e4e6eb;
+    color: #555;
+    border-radius: 50%;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+.toggle-sidebar-btn:hover { background-color: #ccc; }
+.toggle-sidebar-btn i {
+    font-size: 0.9em;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* ESTADO RECOLHIDO */
+.ekko-chat-wrapper.sidebar-collapsed .history-sidebar {
+    width: 0;
+    border: none;
+}
+.ekko-chat-wrapper.sidebar-collapsed .sidebar-toggle {
+    border-right: 1px solid #e7eaec;
+}
+.ekko-chat-wrapper.sidebar-collapsed .toggle-sidebar-btn i {
+    transform: rotate(180deg);
+}
 
 /* --- CHAT PRINCIPAL (DIREITA) --- */
 .ekko-chat-container {
-    flex-grow: 1; /* Faz esta secção ocupar o resto do espaço */
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    background-color: #ffffff;
+}
+
+.ekko-chat-header-main {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    flex-shrink: 0;
+}
+.ekko-chat-header-main .header-icon {
+    width: 36px; height: 36px; background-color: #27ae60;
+    color: white; display: flex; align-items: center;
+    justify-content: center; border-radius: 8px; margin-right: 12px;
+}
+.ekko-chat-header-main h3 {
+    margin: 0; font-size: 1.1em;
+    color: #1c1e21; font-weight: 600;
 }
 
 .ekko-chat-box {
@@ -137,10 +191,8 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
-    background-color: #ffffff;
 }
 
-/* Animação de entrada das mensagens */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
@@ -170,109 +222,79 @@
 }
 
 .ekko-chat-box .status-message {
-    font-style: italic;
-    color: #555;
-    background-color: transparent;
-    text-align: center;
-    font-size: 0.9em;
-    padding: 5px;
-    align-self: center;
+    font-style: italic; color: #555;
+    background-color: transparent; text-align: center;
+    font-size: 0.9em; padding: 5px; align-self: center;
 }
 
 /* --- ÁREA DE INPUT --- */
 .ekko-input-container {
     display: flex;
-    padding: 10px;
-    border-top: 1px solid #ddd;
-    background-color: #f9f9f9;
     align-items: center;
-}
-
-#ekko-user-input {
-    flex-grow: 1;
-    border: 1px solid #ccc;
-    border-radius: 20px;
     padding: 10px 15px;
-    font-size: 1em;
-    margin: 0 10px;
-    transition: border-color 0.2s ease;
+    margin: 0 15px 15px 15px;
+    border-radius: 25px;
+    background-color: #f0f2f5;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
 }
-#ekko-user-input:focus {
-    outline: none;
+.ekko-input-container:focus-within {
     border-color: #27ae60;
+    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.2);
+}
+#ekko-user-input {
+    flex-grow: 1; border: none; background: transparent;
+    outline: none; font-size: 1em; color: #333; padding: 8px;
+    font-family: 'Poppins', sans-serif;
 }
 
 #ekko-send-btn, #ekko-location-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 1.2em;
-    color: #007bff;
-    padding: 8px;
-    transition: transform 0.2s ease, color 0.2s ease;
+    background: none; border: none; cursor: pointer;
+    color: #555; font-size: 1.2em; padding: 8px; border-radius: 50%;
+    transition: all 0.2s ease;
 }
-#ekko-send-btn:hover {
-    transform: scale(1.1);
-    color: #27ae60;
+#ekko-send-btn:hover, #ekko-location-btn:hover {
+    color: #000; background-color: #dcdfe2;
 }
-#ekko-location-btn:hover {
-    transform: scale(1.1);
-}
-
-#ekko-location-btn svg {
-    fill: #555;
-    width: 24px;
-    height: 24px;
-    transition: fill 0.2s ease;
-}
-#ekko-location-btn:hover svg {
-    fill: #000;
-}
+#ekko-location-btn svg { width: 24px; height: 24px; }
 
 /* --- ESTILOS PARA CONTEÚDO GERADO (MARKDOWN) --- */
 .ekko-chat-box table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 15px 0;
-    font-size: 0.9em;
-    background-color: #fff;
-    color: #333;
-    border: 1px solid #ddd;
+    width: 100%; border-collapse: collapse; margin: 15px 0;
+    font-size: 0.9em; background-color: #fff; color: #333; border: 1px solid #ddd;
 }
 .ekko-chat-box th, .ekko-chat-box td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
+    border: 1px solid #ddd; padding: 8px; text-align: left;
 }
-.ekko-chat-box th {
-    background-color: #f2f2f2;
-    font-weight: bold;
+.ekko-chat-box th { background-color: #f2f2f2; font-weight: bold; }
+.ekko-chat-box a { color: #007bff; text-decoration: underline; font-weight: 500; }
+.ekko-chat-box a:hover { color: #0056b3; }
+
+/* --- ESTILOS PARA O POPUP (MODAL) DE CONFIRMAÇÃO --- */
+.confirm-modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 9999; opacity: 0; visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
-.ekko-chat-box a {
-    color: #007bff;
-    text-decoration: underline;
-    font-weight: 500;
+.confirm-modal-overlay.active { opacity: 1; visibility: visible; }
+.confirm-modal-content {
+    background-color: #fff; color: #333; padding: 30px; border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 90%; max-width: 450px;
+    text-align: center; transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
 }
-.ekko-chat-box a:hover {
-    color: #0056b3;
+.confirm-modal-overlay.active .confirm-modal-content { transform: scale(1); }
+.confirm-modal-content h3 { margin-top: 0; margin-bottom: 15px; font-size: 1.5em; }
+.confirm-modal-content p { margin-bottom: 30px; font-size: 1.1em; line-height: 1.6; color: #555; }
+.confirm-modal-actions { display: flex; justify-content: center; gap: 15px; }
+.modal-btn {
+    border: none; border-radius: 8px; padding: 12px 25px;
+    font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
 }
-.ekko-chat-box blockquote {
-    border-left: 3px solid #ccc;
-    padding-left: 10px;
-    margin-left: 5px;
-    color: #555;
-    font-style: italic;
-}
-.ekko-chat-box code {
-    background-color: #d6d6d6;
-    padding: 2px 4px;
-    border-radius: 3px;
-    font-family: 'Courier New', Courier, monospace;
-}
-.ekko-chat-box pre {
-    background-color: #d6d6d6;
-    padding: 10px;
-    border-radius: 5px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-}
+.modal-btn.cancel-btn { background-color: #e0e0e0; color: #555; }
+.modal-btn.cancel-btn:hover { background-color: #ccc; }
+.modal-btn.confirm-btn { background-color: #F44336; color: white; }
+.modal-btn.confirm-btn:hover { background-color: #d32f2f; }

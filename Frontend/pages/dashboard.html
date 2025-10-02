@@ -116,37 +116,50 @@
 
             <!-- Chat EKKO -->
 
-        <section id="chatbot-section" class="content-section">
-            
-            <div class="ekko-chat-wrapper">
-
-                <div class="history-sidebar" id="history-sidebar">
-                    <div class="sidebar-header">
-                        <h3>Histórico</h3>
-                        <button class="new-session-btn" id="new-session-btn" title="Iniciar Nova Conversa">
-                            <i class="fas fa-plus"></i> Nova Conversa
-                        </button>
-                    </div>
-                    <ul class="history-list" id="history-list">
-                        </ul>
-                </div>
-
-                <div class="ekko-chat-container">
-                    <div class="ekko-chat-box" id="ekko-chat-box">
-                        </div>
-                    <div class="ekko-input-container">
-                        <button id="ekko-location-btn" title="Ativar localização para previsão do tempo">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#555555"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
-                        </button>
-                        <input type="text" id="ekko-user-input" placeholder="Pergunte ao Ekko...">
-                        <button id="ekko-send-btn" title="Enviar">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
+            <section id="chatbot-section" class="content-section">
                 
-            </div>
-        </section>
+                <div class="ekko-chat-wrapper" id="ekko-chat-wrapper">
+
+                    <div class="history-sidebar" id="history-sidebar">
+                        <div class="sidebar-header">
+                            <h3>Histórico</h3>
+                            <button class="new-session-btn" id="new-session-btn" title="Iniciar Nova Conversa">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <ul class="history-list" id="history-list">
+                            </ul>
+                    </div>
+
+                    <div class="sidebar-toggle">
+                        <button class="toggle-sidebar-btn" id="toggle-sidebar-btn" title="Recolher/Expandir Histórico">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="ekko-chat-container">
+                        <div class="ekko-chat-header-main">
+                            <div class="header-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM9.47 11.4L7.53 9.47C7.24 9.18 6.76 9.18 6.47 9.47C6.18 9.76 6.18 10.24 6.47 10.53L8.53 12.53C8.82 12.82 9.18 12.82 9.47 12.53C9.76 12.24 9.76 11.76 9.47 11.4ZM17.53 10.53C17.82 10.24 17.82 9.76 17.53 9.47C17.24 9.18 16.76 9.18 16.47 9.47L14.53 11.4C14.24 11.69 14.24 12.17 14.53 12.46C14.82 12.75 15.3 12.75 15.59 12.46L17.53 10.53Z" fill="white"/>
+                                </svg>
+                            </div>
+                            <h3>Assistente de IA Ekko</h3>
+                        </div>
+                        <div class="ekko-chat-box" id="ekko-chat-box"></div>
+                        <div class="ekko-input-container">
+                            <button id="ekko-location-btn" title="Ativar localização para previsão do tempo">
+                                <i class="fas fa-crosshairs"></i>
+                            </button>
+                            <input type="text" id="ekko-user-input" placeholder="Pergunte ao Ekko...">
+                            <button id="ekko-send-btn" title="Enviar">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                </div>
+            </section>
 
 
             <!-- Estatísticas -->

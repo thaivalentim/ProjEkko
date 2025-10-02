@@ -1,6 +1,6 @@
 /**
  * EKKO CHATBOT - LÓGICA DO FRONTEND (CLIENT-SIDE)
- * Versão Definitiva: Agente com Gestão de Sessões, Títulos de IA, Geolocalização e Confirmação de Exclusão.
+ * Versão Definitiva: Agente com Sidebar Retrátil, Gestão de Sessões, Títulos de IA, Geolocalização e Modais Corrigidos.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -10,15 +10,23 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("Módulo do Chatbot Ekko não ativo nesta página.");
         return;
     }
-    console.log("Módulo do Chatbot Ekko inicializado.");
+    console.log("Módulo do Chatbot Ekko inicializado com sucesso.");
 
     // --- ELEMENTOS DA INTERFACE (DOM) ---
+    const chatWrapper = document.getElementById('ekko-chat-wrapper');
+    const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
     const historyList = document.getElementById('history-list');
     const newSessionBtn = document.getElementById('new-session-btn');
     const chatBox = document.getElementById('ekko-chat-box');
     const userInput = document.getElementById('ekko-user-input');
     const sendBtn = document.getElementById('ekko-send-btn');
     const locationBtn = document.getElementById('ekko-location-btn');
+    
+    // Elementos do Modal de Confirmação
+    const confirmModal = document.getElementById('confirm-modal');
+    const confirmModalText = document.getElementById('confirm-modal-text');
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+    const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
     
     // --- CONFIGURAÇÃO ---
     const unityId = localStorage.getItem("unity_id") || "default_user"; 
@@ -30,6 +38,22 @@ document.addEventListener('DOMContentLoaded', () => {
     let isLoading = false;
     let sessions = {};
     let activeSessionId = null;
+
+    // --- LÓGICA DA SIDEBAR RETRÁTIL ---
+    function setupSidebarToggle() {
+        if (!toggleSidebarBtn || !chatWrapper) return;
+        
+        // Verifica se o estado estava guardado no navegador
+        if (localStorage.getItem('ekkoSidebarCollapsed') === 'true') {
+            chatWrapper.classList.add('sidebar-collapsed');
+        }
+
+        toggleSidebarBtn.addEventListener('click', () => {
+            chatWrapper.classList.toggle('sidebar-collapsed');
+            // Guarda a preferência do utilizador para a próxima visita
+            localStorage.setItem('ekkoSidebarCollapsed', chatWrapper.classList.contains('sidebar-collapsed'));
+        });
+    }
 
     // --- LÓGICA DE GESTÃO DE SESSÕES ---
 
@@ -53,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderHistorySidebar() {
         historyList.innerHTML = '';
-        // Ordena as sessões pela data de criação (ID), da mais recente para a mais antiga
         const sortedSessionIds = Object.keys(sessions).sort((a, b) => b.localeCompare(a));
 
         sortedSessionIds.forEach(sessionId => {
@@ -71,8 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
             deleteBtn.innerHTML = '&times;';
             deleteBtn.title = "Apagar conversa";
             deleteBtn.onclick = (e) => {
-                e.stopPropagation(); // Impede que o clique na cruz mude de aba
-                deleteSession(sessionId); // Chama a nossa nova função com confirmação
+                e.stopPropagation();
+                deleteSession(sessionId);
             };
             item.appendChild(deleteBtn);
 
@@ -102,7 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
         loadSession(newSessionId);
     }
 
-    // FUNÇÃO ATUALIZADA COM O POPUP DE CONFIRMAÇÃO
     function deleteSession(sessionIdToDelete) {
         if (Object.keys(sessions).length <= 1) {
             alert("Não é possível apagar a única conversa existente.");
@@ -111,22 +133,46 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const sessionTitle = sessions[sessionIdToDelete].title;
         
-        // Abre o popup de confirmação nativo do navegador
-        const isConfirmed = confirm(`Tem a certeza de que quer apagar a conversa "${sessionTitle}"?\n\nEsta ação não pode ser desfeita.`);
+        confirmModalText.textContent = `Tem a certeza de que quer apagar a conversa "${sessionTitle}"? Esta ação não pode ser desfeita.`;
+        confirmModal.classList.add('active');
 
-        // O código só continua se o utilizador clicar em "OK"
-        if (isConfirmed) {
+        function closeModal() {
+            confirmModal.classList.remove('active');
+            confirmDeleteBtn.onclick = null;
+            cancelDeleteBtn.onclick = null;
+            confirmModal.onclick = null;
+        }
+
+        const handleConfirm = () => {
             console.log(`Sessão "${sessionTitle}" apagada.`);
             delete sessions[sessionIdToDelete];
+
             if (activeSessionId === sessionIdToDelete) {
-                // Ativa a sessão mais recente se a ativa for apagada
                 activeSessionId = Object.keys(sessions).sort((a, b) => b.localeCompare(a))[0];
             }
-            loadSession(activeSessionId); // Carrega a nova sessão ativa
-        } else {
-            console.log("Exclusão da sessão cancelada pelo utilizador.");
-            // Se o utilizador clicar em "Cancelar", não fazemos nada.
-        }
+            
+            // Se, após apagar, não sobrar nenhuma sessão, cria uma nova
+            if (!activeSessionId) {
+                createNewSession();
+            } else {
+                loadSession(activeSessionId);
+            }
+            
+            closeModal();
+        };
+
+        const handleCancel = () => {
+            console.log("Exclusão da sessão cancelada.");
+            closeModal();
+        };
+
+        confirmDeleteBtn.onclick = handleConfirm;
+        cancelDeleteBtn.onclick = handleCancel;
+        confirmModal.onclick = (event) => {
+            if (event.target === confirmModal) {
+                handleCancel();
+            }
+        };
     }
     
     // --- LÓGICA DO CHAT (FUNÇÕES DE UI E COMUNICAÇÃO) ---
@@ -158,7 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function createBotMessageElement() {
-        // Cria um placeholder temporário para saber onde a nova mensagem do bot vai entrar
         const placeholderId = `bot-msg-${new Date().getTime()}`;
         const botMsgHtml = `<div class="message bot-message" id="${placeholderId}"></div>`;
         sessions[activeSessionId].history += botMsgHtml;
@@ -172,8 +217,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const fullText = (element.dataset.fullText || '') + newTextChunk;
         element.dataset.fullText = fullText;
         element.innerHTML = marked.parse(fullText);
-        // Atualiza o histórico com o conteúdo renderizado final a cada chunk
+        // Atualiza o histórico com o conteúdo HTML renderizado para manter a formatação
         sessions[activeSessionId].history = chatBox.innerHTML;
+        smoothScrollToBottom();
+    }
+    
+    function addBotInfoMessage(message) {
+        const botMsgHtml = `<div class="message bot-message">${message}</div>`;
+        sessions[activeSessionId].history += botMsgHtml;
+        chatBox.innerHTML = sessions[activeSessionId].history;
+        saveSessions();
         smoothScrollToBottom();
     }
 
@@ -208,8 +261,9 @@ document.addEventListener('DOMContentLoaded', () => {
             while (true) {
                 const { value, done } = await reader.read();
                 if (done) {
-                    saveSessions(); // Salva o estado final da conversa
-                    generateSessionTitle(activeSessionId); // Tenta gerar um título
+                    if (botMessageElement) botMessageElement.removeAttribute('id');
+                    saveSessions();
+                    generateSessionTitle(activeSessionId);
                     break;
                 }
 
@@ -231,8 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             removeStatusMessage();
-            const botMsg = createBotMessageElement();
-            updateBotMessage(botMsg, "Ops! Tive um problema de comunicação com o servidor.");
+            addBotInfoMessage("Ops! Tive um problema de comunicação com o servidor.");
             console.error('Erro ao enviar mensagem:', error);
         } finally {
             isLoading = false;
@@ -243,11 +296,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const session = sessions[sessionId];
         const messageCount = (session.history.match(/class="message/g) || []).length;
         
-        if (!session.title.startsWith('Nova Conversa') || messageCount < 4) {
-            return;
-        }
-
-        console.log(`A gerar título para a sessão ${sessionId}...`);
+        if (!session.title.startsWith('Nova Conversa') || messageCount < 4) return;
+        
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = session.history;
         const historyText = tempDiv.innerText;
@@ -280,23 +330,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         latitude: position.coords.latitude,
                         longitude: position.coords.longitude
                     };
-                    const botMsg = createBotMessageElement();
-                    updateBotMessage(botMsg, "Localização ativada! Agora posso fornecer previsões do tempo precisas.");
-                    saveSessions();
+                    addBotInfoMessage("Localização ativada! Posso agora fornecer previsões do tempo precisas.");
                     locationBtn.querySelector('svg').style.fill = '#27ae60';
                 },
                 (error) => {
                     removeStatusMessage();
-                    const botMsg = createBotMessageElement();
-                    updateBotMessage(botMsg, "Não foi possível obter a sua localização. Verifique as permissões do navegador.");
-                    saveSessions();
+                    addBotInfoMessage("Não foi possível obter a sua localização. Verifique as permissões do navegador.");
                     console.error("Erro de Geolocalização:", error.message);
                 }
             );
         } else {
-             const botMsg = createBotMessageElement();
-             updateBotMessage(botMsg, "Geolocalização não é suportada por este navegador.");
-             saveSessions();
+             addBotInfoMessage("Geolocalização não é suportada por este navegador.");
         }
     }
 
@@ -312,5 +356,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     locationBtn.addEventListener('click', getLocation);
     
-    loadSessions(); // Inicia todo o sistema
+    setupSidebarToggle(); // Ativa a funcionalidade da sidebar
+    loadSessions(); // Inicia todo o sistema de sessões
 });
