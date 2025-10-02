@@ -1,0 +1,27 @@
+#siga esse caminho para instalar as bibliotecas
+# cd Backend/pycache
+# copie isso e cole do terminal
+#pip install -r requirements.txt
+
+
+# Framework e Servidor
+fastapi
+uvicorn[standard]
+
+# Banco de Dados
+pymongo
+python-dotenv
+
+# IA (Stack Local - Ollama) e Busca
+requests
+ddgs
+sentence-transformers
+faiss-cpu
+
+# Utilitários
+pydantic
+numpy
+datetime
+beautifulsoup4
+python-multipart
+

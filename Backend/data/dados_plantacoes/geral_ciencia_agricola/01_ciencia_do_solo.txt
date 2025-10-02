@@ -1,0 +1,15 @@
+Tópico: A Ciência do Solo (Teoria Fundamental)
+
+O solo é um organismo vivo e complexo, com três componentes: a física, a química e a biologia.
+
+**1. Física do Solo:**
+* **Textura:** Proporção de Areia, Silte e Argila. Solos argilosos (comuns no Sul de Minas) retêm mais água e nutrientes.
+* **Estrutura:** Agrupamento das partículas. Uma boa estrutura permite que a água infiltre, o ar circule e as raízes cresçam.
+
+**2. Química do Solo:**
+* **pH (Potencial Hidrogeniônico):** Medida de acidez. Controla a disponibilidade de TODOS os nutrientes. Em solos ácidos (pH < 5.5), nutrientes ficam "presos" e o Alumínio tóxico é liberado, queimando as raízes. A calagem corrige isso.
+* **CTC (Capacidade de Troca de Cátions):** A "caixa d'água de nutrientes" do solo. A capacidade do solo de reter nutrientes como Cálcio, Magnésio e Potássio.
+
+**3. Biologia do Solo:**
+* **Matéria Orgânica:** Alimento para os microrganismos.
+* **Microrganismos:** Bilhões de bactérias e fungos que decompõem a matéria orgânica, liberam nutrientes para as plantas e ajudam a formar a boa estrutura do solo.
