@@ -55,7 +55,7 @@ const MonitoringModule = {
                             </button>
                             
                             <button class="btn-export" id="export-btn" style="background: var(--tech-blue); color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
-                                <i class="fas fa-download"></i> Exportar CSV
+                                <i class="fas fa-file-pdf"></i> Exportar PDF
                             </button>
                         </div>
                     </div>
@@ -286,7 +286,7 @@ const MonitoringModule = {
             }
             
             if (e.target.closest('#export-btn')) {
-                this.exportCSV();
+                this.exportPDF();
             }
         });
         
@@ -354,7 +354,7 @@ const MonitoringModule = {
             
             if (response.ok) {
                 const result = await response.json();
-                console.log('Dados recebidos:', result);
+                console.log('Dados recebidos:', result.data?.length || 0, 'registros');
                 
                 if (result.status === 'success' && result.data && result.data.length > 0) {
                     this.realData = result.data;
@@ -394,32 +394,236 @@ const MonitoringModule = {
         return this.realData || [];
     },
     
-
-    
-    // Exportar CSV
-    exportCSV() {
+    // Exportar PDF da tabela de monitoramento
+    exportPDF() {
         const filteredData = this.getFilteredData();
         if (filteredData.length === 0) {
             alert('Nenhum dado disponível para exportar');
             return;
         }
         
-        const headers = ['Hora', 'pH', 'Umidade', 'Temperatura', 'Salinidade', 'Condutividade', 'N', 'P', 'K', 'Status'];
-        const csvContent = [
-            headers.join(','),
-            ...filteredData.map(row => [
-                row.hora, row.ph, row.umidade, row.temp, row.salinidade, 
-                row.condutividade, row.n, row.p, row.k, row.status
-            ].join(','))
-        ].join('\n');
+        const unityId = this.getCurrentUserId();
+        const dataAtual = new Date().toLocaleDateString('pt-BR');
+        const horaAtual = new Date().toLocaleTimeString('pt-BR');
         
-        const blob = new Blob([csvContent], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `monitoramento_${new Date().toISOString().split('T')[0]}.csv`;
-        a.click();
-        window.URL.revokeObjectURL(url);
+        const periodText = {
+            '1h': 'Última hora',
+            '6h': 'Últimas 6 horas', 
+            '24h': 'Últimas 24 horas',
+            '7d': 'Últimos 7 dias'
+        };
+        
+        // Criar documento PDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Configurações
+        const pageWidth = doc.internal.pageSize.width;
+        const margin = 20;
+        
+        // Cabeçalho melhorado
+        doc.setFontSize(28);
+        doc.setTextColor(22, 101, 52); // Verde escuro profissional
+        doc.setFont('helvetica', 'bold');
+        const titleText = 'EKKO';
+        const titleWidth = doc.getTextWidth(titleText);
+        const titleX = (pageWidth - titleWidth) / 2;
+        doc.text(titleText, titleX, 18);
+        
+        doc.setFontSize(14);
+        doc.setTextColor(55, 65, 81); // Cinza escuro
+        doc.setFont('helvetica', 'normal');
+        const subtitleText = 'Relatório de Monitoramento Agrícola';
+        const subtitleWidth = doc.getTextWidth(subtitleText);
+        const subtitleX = (pageWidth - subtitleWidth) / 2;
+        doc.text(subtitleText, subtitleX, 26);
+        
+        // Linha decorativa
+        doc.setDrawColor(22, 101, 52);
+        doc.setLineWidth(1.5);
+        doc.line(margin, 32, pageWidth - margin, 32);
+        
+        // Metadados
+        doc.setFontSize(11);
+        doc.setTextColor(75, 85, 99); // Cinza médio
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Data de Exportação: ${dataAtual} às ${horaAtual}`, margin, 44);
+        doc.text(`ID do usuário: ${unityId}`, margin, 51);
+        doc.text(`Período: ${periodText[this.state.currentPeriod]}`, margin, 58);
+        doc.text(`Total de Registros: ${filteredData.length}`, margin, 65);
+        
+        // Calcular métricas para resumo
+        const metrics = this.calculateMetrics();
+        
+        // Resumo estatístico
+        doc.setFontSize(16);
+        doc.setTextColor(22, 101, 52); // Verde escuro
+        doc.setFont('helvetica', 'bold');
+        doc.text('Resumo Estatístico', margin, 79);
+        
+        doc.setFontSize(11);
+        doc.setTextColor(31, 41, 55); // Cinza muito escuro
+        doc.setFont('helvetica', 'normal');
+        doc.text(`• pH Médio: ${metrics.avgPh}`, margin + 5, 89);
+        doc.text(`• Alertas Ativos: ${metrics.alertas}`, margin + 5, 96);
+        doc.text(`• Saúde Geral: ${metrics.saudeGeral}%`, margin + 5, 103);
+        doc.text(`• Última Leitura: ${metrics.ultimaLeitura}`, margin + 5, 110);
+        
+        // Preparar dados da tabela
+        const tableHeaders = [
+            'Hora', 'pH', 'Umid\n(%)', 'T\n(°C)', 
+            'Sal\n(ppm)', 'Cond\n(dS/m)', 
+            'N\n(mg/kg)', 'P\n(mg/kg)', 'K\n(mg/kg)', 'Status'
+        ];
+        
+        const tableData = filteredData.map(row => [
+            row.hora,
+            row.ph.toString().replace('.', ','),
+            row.umidade.toString().replace('.', ','),
+            row.temp.toString().replace('.', ','),
+            row.salinidade.toString().replace('.', ','),
+            row.condutividade.toString().replace('.', ','),
+            row.n.toString().replace('.', ','),
+            row.p.toString().replace('.', ','),
+            row.k.toString().replace('.', ','),
+            row.status === 'ideal' ? 'Ideal' : row.status === 'atencao' ? 'Atenção' : 'Crítico'
+        ]);
+        
+        // Gerar tabela com larguras otimizadas
+        doc.autoTable({
+            head: [tableHeaders],
+            body: tableData,
+            startY: 119,
+            margin: { left: 10, right: 10 },
+            tableWidth: 'auto',
+            styles: {
+                fontSize: 9,
+                cellPadding: 4,
+                halign: 'center',
+                valign: 'middle',
+                lineColor: [200, 200, 200],
+                lineWidth: 0.5
+            },
+            headStyles: {
+                fillColor: [22, 101, 52], // Verde escuro
+                textColor: 255,
+                fontStyle: 'bold',
+                fontSize: 10,
+                halign: 'center',
+                cellPadding: 5
+            },
+            bodyStyles: {
+                textColor: [31, 41, 55], // Cinza escuro
+                fontSize: 9
+            },
+            alternateRowStyles: {
+                fillColor: [248, 250, 252] 
+            },
+            columnStyles: {
+                0: { // Horário
+                    cellWidth: 18,
+                    halign: 'center',
+                    fontStyle: 'bold',
+                    fontSize: 8
+                },
+                1: { // pH
+                    cellWidth: 15,
+                    halign: 'center'
+                },
+                2: { // Umidade
+                    cellWidth: 20,
+                    halign: 'center'
+                },
+                3: { // Temperatura
+                    cellWidth: 18,
+                    halign: 'center'
+                },
+                4: { // Salinidade
+                    cellWidth: 22,
+                    halign: 'center'
+                },
+                5: { // Condutividade
+                    cellWidth: 21,
+                    halign: 'center'
+                },
+                6: { // Nitrogênio
+                    cellWidth: 18,
+                    halign: 'center'
+                },
+                7: { // Fósforo
+                    cellWidth: 18,
+                    halign: 'center'
+                },
+                8: { // Potássio
+                    cellWidth: 18,
+                    halign: 'center'
+                },
+                9: { // Status
+                    cellWidth: 22,
+                    halign: 'center',
+                    fontStyle: 'bold'
+                }
+            },
+            didParseCell: function(data) {
+                // Colorir status
+                if (data.column.index === 9 && data.section === 'body') {
+                    const status = data.cell.raw;
+                    if (status === 'Ideal') {
+                        data.cell.styles.textColor = [34, 197, 94]; // Verde
+                        data.cell.styles.fillColor = [240, 253, 244]; // Fundo verde claro
+                    } else if (status === 'Atenção') {
+                        data.cell.styles.textColor = [249, 115, 22]; // Laranja
+                        data.cell.styles.fillColor = [255, 247, 237]; // Fundo laranja claro
+                    } else if (status === 'Crítico') {
+                        data.cell.styles.textColor = [239, 68, 68]; // Vermelho
+                        data.cell.styles.fillColor = [254, 242, 242]; // Fundo vermelho claro
+                    }
+                }
+                
+                // Destacar horário
+                if (data.column.index === 0 && data.section === 'body') {
+                    data.cell.styles.fillColor = [245, 245, 245]; // Fundo cinza para horário
+                }
+            }
+        });
+        
+        // Rodapé
+        const finalY = doc.lastAutoTable.finalY + 15;
+        doc.setFontSize(9);
+        doc.setTextColor(107, 114, 128); // Cinza médio
+        doc.setFont('helvetica', 'normal');
+        const footerText = 'Gerado por EKKO - Agricultura de Precisão | ETE FMC - Santa Rita do Sapucaí, MG';
+        const textWidth = doc.getTextWidth(footerText);
+        const centerX = (pageWidth - textWidth) / 2;
+        doc.text(footerText, centerX, finalY);
+        
+        // Adicionar número da página
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(107, 114, 128);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Página ${i} de ${pageCount}`, pageWidth - 30, doc.internal.pageSize.height - 10);
+        }
+        
+        // Salvar arquivo com nome mais profissional
+        const timestamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
+        const fileName = `EKKO_Relatorio_Monitoramento_${timestamp}_${unityId.substring(0, 8)}.pdf`;
+        doc.save(fileName);
+        
+        // Feedback visual
+        const exportBtn = document.getElementById('export-btn');
+        if (exportBtn) {
+            const originalText = exportBtn.innerHTML;
+            exportBtn.innerHTML = '<i class="fas fa-check"></i> PDF Gerado!';
+            exportBtn.style.background = 'var(--secondary-green)';
+            
+            setTimeout(() => {
+                exportBtn.innerHTML = originalText;
+                exportBtn.style.background = 'var(--tech-blue)';
+            }, 2000);
+        }
     },
     
     // Atualizar tempo da última atualização
