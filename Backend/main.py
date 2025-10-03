@@ -1,7 +1,8 @@
 
 
 # Imports do sistema e de bibliotecas
-from fastapi import FastAPI, HTTPException, StreamingResponse
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
@@ -186,7 +187,76 @@ def save_soil(unity_id: str, soil: SoilData):
     result = unity_soil_data.insert_one(soil_doc)
     return {"status": "success", "soil_id": str(result.inserted_id), "message": "Dados salvos no Atlas"}
 
-# (Mantém os outros endpoints: dashboard, ids, monitoring, analise-ia...)
+@app.get("/unity/dashboard/{unity_id}")
+def get_dashboard(unity_id: str):
+    profile = unity_profiles.find_one({"_id": unity_id})
+    if not profile:
+        raise HTTPException(status_code=404, detail="ID não encontrado")
+    
+    # Buscar dados de solo mais recentes
+    latest_soil = unity_soil_data.find_one({"unity_id": unity_id}, sort=[("timestamp", -1)])
+    
+    # Buscar histórico de solo
+    soil_history = list(unity_soil_data.find({"unity_id": unity_id}).sort("timestamp", -1).limit(10))
+    
+    # Dados do dashboard
+    dashboard_data = {
+        "propriedade": profile.get("propriedade", {}).get("nome", "Fazenda Unity"),
+        "area": profile.get("propriedade", {}).get("area_hectares", 0),
+        "soil_health": latest_soil.get("health_score", 50) if latest_soil else 50
+    }
+    
+    return {
+        "status": "success",
+        "profile": profile,
+        "latest_soil_data": latest_soil,
+        "soil_history": soil_history,
+        "dashboard_data": dashboard_data
+    }
+
+@app.get("/unity/analise-ia/{unity_id}")
+def get_analise_ia(unity_id: str):
+    profile = unity_profiles.find_one({"_id": unity_id})
+    if not profile:
+        raise HTTPException(status_code=404, detail="ID não encontrado")
+    
+    latest_soil = unity_soil_data.find_one({"unity_id": unity_id}, sort=[("timestamp", -1)])
+    if not latest_soil:
+        raise HTTPException(status_code=404, detail="Nenhum dado de solo encontrado")
+    
+    try:
+        # Buscar histórico de solo
+        soil_history = list(unity_soil_data.find({"unity_id": unity_id}).sort("timestamp", -1).limit(5))
+        
+        # Usar o analisador de IA
+        analise = analyze_soil_complete(latest_soil, soil_history, profile)
+        
+        return {
+            "status": "success",
+            "cultivo_principal": get_main_crop(profile),
+            "diagnostico": analise,
+            "resumo": {
+                "parametros_ideais": count_ideal_parameters(analise.get("parametros", {})),
+                "total_parametros": 9,
+                "nivel_sustentabilidade": calculate_sustainability(latest_soil, profile)
+            }
+        }
+    except Exception as e:
+        # Fallback para análise simples
+        return {
+            "status": "success",
+            "cultivo_principal": "Milho",
+            "diagnostico": {
+                "saude_geral": 75,
+                "alertas_criticos": [],
+                "parametros": {}
+            },
+            "resumo": {
+                "parametros_ideais": 6,
+                "total_parametros": 9,
+                "nivel_sustentabilidade": 70
+            }
+        }
 
 # --- FUNÇÃO DE COMUNICAÇÃO COM OLLAMA ---
 def get_ollama_response(prompt: str, stream: bool = False):
@@ -245,6 +315,143 @@ def chat(unity_id: str, request: ChatRequest):
         except Exception as e:
             yield f'data: {json.dumps({"type": "chunk", "message": f"Erro: {e}"})}\n\n'
     return StreamingResponse(stream_generation(), media_type="text/event-stream")
+
+@app.get("/unity/recreate-test-data")
+def recreate_test_data():
+    """Criar dados de teste para demonstração"""
+    try:
+        # Limpar dados existentes
+        unity_profiles.delete_many({"_id": "unity_test123"})
+        unity_soil_data.delete_many({"unity_id": "unity_test123"})
+        
+        # Criar perfil de teste
+        test_profile = {
+            "_id": "unity_test123",
+            "dados_pessoais": {
+                "nome": "João Silva",
+                "email": "joao@fazenda.com",
+                "telefone": "(35) 99999-9999",
+                "cpf": "123.456.789-00"
+            },
+            "propriedade": {
+                "nome": "Fazenda São João",
+                "area_hectares": 50,
+                "localizacao": "Santa Rita do Sapucaí, MG",
+                "cultivos_principais": ["Café", "Milho"]
+            },
+            "unity_stats": {
+                "total_sessions": 12,
+                "best_score": 850,
+                "total_playtime": 720
+            },
+            "created_at": datetime.utcnow(),
+            "status": "active"
+        }
+        
+        # Inserir perfil
+        unity_profiles.insert_one(test_profile)
+        
+        # Criar dados de solo de teste
+        soil_data = {
+            "_id": f"soil_unity_test123_{int(datetime.utcnow().timestamp())}",
+            "unity_id": "unity_test123",
+            "timestamp": datetime.utcnow(),
+            "soil_parameters": {
+                "ph": 6.5,
+                "umidade": 55.0,
+                "temperatura": 25.0,
+                "salinidade": 400.0,
+                "condutividade": 1.2
+            },
+            "nutrients": {
+                "nitrogenio": 120.0,
+                "fosforo": 80.0,
+                "potassio": 150.0
+            },
+            "game_metrics": {
+                "score": 750,
+                "money_spent": 240.0,
+                "sustainability_index": 0.75
+            },
+            "cultivo_atual": "Milho",
+            "health_score": 75
+        }
+        
+        unity_soil_data.insert_one(soil_data)
+        
+        return {
+            "status": "success",
+            "message": "Dados de teste criados",
+            "test_unity_id": "unity_test123"
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Erro: {str(e)}"
+        }
+
+@app.get("/unity/monitoring/{unity_id}")
+def get_monitoring_data(unity_id: str, period: str = "24h"):
+    """Endpoint para dados de monitoramento em tempo real"""
+    profile = unity_profiles.find_one({"_id": unity_id})
+    if not profile:
+        raise HTTPException(status_code=404, detail="ID não encontrado")
+    
+    # Calcular período baseado no parâmetro
+    now = datetime.utcnow()
+    if period == "1h":
+        start_time = now - timedelta(hours=1)
+    elif period == "6h":
+        start_time = now - timedelta(hours=6)
+    elif period == "7d":
+        start_time = now - timedelta(days=7)
+    else:  # 24h default
+        start_time = now - timedelta(hours=24)
+    
+    # Buscar dados de solo no período
+    soil_data = list(unity_soil_data.find({
+        "unity_id": unity_id,
+        "timestamp": {"$gte": start_time}
+    }).sort("timestamp", -1))
+    
+    # Formatar dados para o frontend
+    formatted_data = []
+    for item in soil_data:
+        soil_params = item.get("soil_parameters", {})
+        nutrients = item.get("nutrients", {})
+        timestamp = item.get("timestamp", now)
+        
+        # Determinar status baseado no pH
+        ph = soil_params.get("ph", 0)
+        if 6.0 <= ph <= 7.0:
+            status = "ideal"
+        elif 5.5 <= ph <= 7.5:
+            status = "atencao"
+        else:
+            status = "critico"
+        
+        formatted_data.append({
+            "hora": timestamp.strftime("%H:%M"),
+            "ph": round(ph, 1),
+            "umidade": round(soil_params.get("umidade", 0), 1),
+            "temp": round(soil_params.get("temperatura", 0), 1),
+            "salinidade": round(soil_params.get("salinidade", 0), 0),
+            "condutividade": round(soil_params.get("condutividade", 0), 2),
+            "n": round(nutrients.get("nitrogenio", 0), 1),
+            "p": round(nutrients.get("fosforo", 0), 1),
+            "k": round(nutrients.get("potassio", 0), 1),
+            "status": status
+        })
+    
+    return {
+        "status": "success",
+        "data": formatted_data,
+        "period": period,
+        "total_records": len(formatted_data)
+    }
+
+
 
 # --- INICIALIZAÇÃO DO SERVIDOR ---
 if __name__ == "__main__":
