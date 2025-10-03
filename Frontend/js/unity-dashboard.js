@@ -127,7 +127,7 @@ const UnityDashboard = {
                     
                     <!-- Texto à Direita -->
                     <div style="padding-left: 2rem;">
-                        <h1 style="font-family: 'Playfair Display', 'Georgia', serif; font-size: 3.5rem; font-weight: 300; color: #1a202c; margin-bottom: 1rem; line-height: 1.1; letter-spacing: -0.02em;">Bem-vindo ao EKKO</h1>
+                        <h1 style="font-family: 'Playfair Display', 'Georgia', serif; font-size: 3.5rem; font-weight: 300; color: #1a202c; margin-bottom: 1rem; line-height: 1.1; letter-spacing: -0.02em;">Website Ekko</h1>
                         
                         <p style="font-family: 'Inter', sans-serif; font-size: 1.3rem; font-weight: 500; color: var(--secondary-green); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.1em;">Agricultura Inteligente e Sustentável</p>
                         
@@ -1443,22 +1443,28 @@ const UnityDashboard = {
         }
         
         const titles = {
-            'dashboard': 'Início',
-            'profile': 'Perfil',
-            'ai': 'IA & Solo',
-            'heatmap': 'Estatísticas',
-            'readings': 'Unity',
-            'development': 'Desenvolvimento',
-            'monitoring': 'Monitoramento Real Time'
+            'dashboard': 'Dashboard Principal',
+            'profile': 'Minha Conta',
+            'ai': 'Análise Inteligente',
+            'heatmap': 'Relatórios',
+            'readings': 'Simulação',
+            'development': 'Sobre o Sistema',
+            'monitoring': 'Supervisionamento'
+        };
+        
+        const contextualInfo = {
+            'dashboard': 'Bem-vindo de volta! Monitore sua fazenda virtual e dados em tempo real',
+            'profile': `Acesse suas informações pessoais • ${this.currentUserData?.profile?.unity_stats?.total_sessions || 0} sessões • Nível ${this.currentUserData?.profile?.unity_stats?.nivel || 'Iniciante'}`,
+            'ai': 'Análise baseada em 9 parâmetros de solo • IA treinada com fontes brasileiras',
+            'heatmap': 'Visualizações detalhadas dos dados coletados durante a simulação',
+            'readings': 'Histórico completo das suas sessões de jogo e performance',
+            'development': 'Documentação técnica',
+            'monitoring': 'Monitore continuamente dados coletados via tecnologia IoT simulada • Atualização automática'
         };
         
         if (titles[sectionId]) {
             document.getElementById('page-title').textContent = titles[sectionId];
-            if (sectionId === 'dashboard') {
-                document.getElementById('breadcrumb').textContent = 'Dashboard';
-            } else {
-                document.getElementById('breadcrumb').textContent = `Dashboard > ${titles[sectionId]}`;
-            }
+            document.getElementById('breadcrumb').textContent = contextualInfo[sectionId];
         }
     },
 
