@@ -1459,7 +1459,8 @@ const UnityDashboard = {
             'heatmap': 'Visualizações detalhadas dos dados coletados durante a simulação',
             'readings': 'Histórico completo das suas sessões de jogo e performance',
             'development': 'Documentação técnica',
-            'monitoring': 'Monitore continuamente dados coletados via tecnologia IoT simulada • Atualização automática'
+            'monitoring': 'Monitoramento',
+            'chatbot': 'Converse com nossa IA especializada em agricultura sustentável'
         };
         
         if (titles[sectionId]) {
