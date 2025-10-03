@@ -1,7 +1,4 @@
-/**
- * EKKO CHATBOT - LÓGICA DO FRONTEND (CLIENT-SIDE)
- * Versão Definitiva: Agente com Sidebar Retrátil, Gestão de Sessões, Títulos de IA, Geolocalização e Modais Corrigidos.
- */
+
 
 document.addEventListener('DOMContentLoaded', () => {
 
