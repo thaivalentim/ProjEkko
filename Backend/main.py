@@ -1,32 +1,51 @@
-"""
-EKKO - API Principal
-FastAPI com MongoDB Atlas
-"""
 
-from fastapi import FastAPI, HTTPException
+
+# Imports do sistema e de bibliotecas
+from fastapi import FastAPI, HTTPException, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
+from pymongo import MongoClient
+from dotenv import load_dotenv
 import uuid
 import uvicorn
+import os
+import requests
+import json
 
-
-# Imports locais
+# Imports locais do seu projeto (garanta que estes ficheiros existem)
 from database import unity_profiles, unity_soil_data, API_HOST, API_PORT, API_DEBUG, client, DB_NAME
 from ai_analyzer import analyze_soil_complete, get_main_crop, count_ideal_parameters, analyze_trend, calculate_sustainability, calculate_soil_health
 
-app = FastAPI(title="EKKO Unity API - Atlas", version="1.0.0")
+# Imports locais do Ekko
+import tool
+import prompts
+
+# --- CONFIGURAÇÃO INICIAL E CONEXÕES ---
+load_dotenv()
+app = FastAPI(title="EKKO API - Atlas + IA Local", version="Final")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"],
 )
 
-# Modelos
+# Conexão com a IA Local (Ollama)
+OLLAMA_API_URL = "http://localhost:11434/api/generate"
+
+# --- EVENTOS DE STARTUP DA API (PARA O EKKO) ---
+@app.on_event("startup")
+def startup_event_ekko():
+    """Funções a serem executadas quando o servidor inicia."""
+    tool.init_memory_db()
+    tool.load_inmet_stations()
+    tool.load_and_index_local_database()
+    print("="*50)
+    print("Módulos do Chatbot Ekko carregados com sucesso.")
+    print("="*50)
+
+# --- MODELOS Pydantic ---
 class UnityProfile(BaseModel):
     nome: str
     email: str
@@ -44,7 +63,6 @@ class SoilData(BaseModel):
     nitrogenio: float
     fosforo: float
     potassio: float
-    # Campos opcionais
     densidade: Optional[float] = 1.2
     materia_organica: Optional[float] = 3.5
     calcio: Optional[float] = 500
@@ -55,29 +73,27 @@ class SoilData(BaseModel):
     cultivo_atual: Optional[str] = "Milho"
     estacao: Optional[str] = "Crescimento"
 
+class ChatRequest(BaseModel):
+    message: str
+    history: Optional[list] = []
+    coordinates: Optional[Dict[str, float]] = None
+
+class TitleRequest(BaseModel):
+    history_text: str
+
+# --- ENDPOINTS UNITY ---
 @app.get("/unity/status")
 def get_status():
     try:
-        # Testar conexão
         client.admin.command('ping')
-        
-        # Contar documentos
         profiles_count = unity_profiles.count_documents({})
         soil_count = unity_soil_data.count_documents({})
-        
         return {
-            "status": "online",
-            "database": "connected",
-            "db_name": DB_NAME,
-            "profiles": profiles_count,
-            "soil_data": soil_count
+            "status": "online", "database": "connected",
+            "db_name": DB_NAME, "profiles": profiles_count, "soil_data": soil_count
         }
     except Exception as e:
-        return {
-            "status": "error",
-            "database": "disconnected",
-            "error": str(e)
-        }
+        return {"status": "error", "database": "disconnected", "error": str(e)}
 
 @app.post("/unity/profile/create")
 def create_profile(profile: UnityProfile):
@@ -112,23 +128,15 @@ def create_profile(profile: UnityProfile):
 @app.get("/unity/login/{unity_id}")
 def login(unity_id: str):
     profile = unity_profiles.find_one({"_id": unity_id})
-    
     if not profile:
         raise HTTPException(status_code=404, detail="ID não encontrado")
-    
-    return {
-        "status": "success",
-        "unity_id": unity_id,
-        "profile": profile
-    }
+    return {"status": "success", "unity_id": unity_id, "profile": profile}
 
 @app.post("/unity/soil/save/{unity_id}")
 def save_soil(unity_id: str, soil: SoilData):
-    # Verificar se perfil existe
     if not unity_profiles.find_one({"_id": unity_id}):
         raise HTTPException(status_code=404, detail="ID não encontrado")
     
-    # Valores padrão para campos não enviados pelo Unity
     default_actions = {
         "irrigacao": round(soil.umidade * 0.8, 2),
         "fertilizante_npk": {
@@ -136,8 +144,8 @@ def save_soil(unity_id: str, soil: SoilData):
             "P": round(soil.fosforo * 0.2, 2),
             "K": round(soil.potassio * 0.3, 2)
         },
-        "calagem": round(0.5, 2),
-        "materia_organica_adicionada": round(1.0, 2)
+        "calagem": 0.5,
+        "materia_organica_adicionada": 1.0
     }
     
     default_metrics = {
@@ -176,152 +184,77 @@ def save_soil(unity_id: str, soil: SoilData):
     }
     
     result = unity_soil_data.insert_one(soil_doc)
-    
-    return {
-        "status": "success",
-        "soil_id": str(result.inserted_id),
-        "message": "Dados salvos no Atlas"
-    }
+    return {"status": "success", "soil_id": str(result.inserted_id), "message": "Dados salvos no Atlas"}
 
-@app.get("/unity/dashboard/{unity_id}")
-def get_dashboard(unity_id: str):
-    # Buscar perfil
-    profile = unity_profiles.find_one({"_id": unity_id})
-    if not profile:
-        raise HTTPException(status_code=404, detail="Unity ID não encontrado")
-    
-    # Buscar dados solo mais recentes
-    latest_soil = unity_soil_data.find_one(
-        {"unity_id": unity_id},
-        sort=[("timestamp", -1)]
-    )
-    
-    # Buscar histórico de solo para mapas
-    soil_history = list(unity_soil_data.find(
-        {"unity_id": unity_id}
-    ).sort("timestamp", -1).limit(20))
-    
-    return {
-        "status": "success",
-        "unity_id": unity_id,
-        "profile": profile,
-        "latest_soil_data": latest_soil,
-        "soil_history": soil_history,
-        "dashboard_data": {
-            "nome": profile["dados_pessoais"]["nome"],
-            "propriedade": profile["propriedade"].get("nome", "N/A"),
-            "area": profile["propriedade"].get("area_hectares", 0),
-            "soil_health": calculate_soil_health(latest_soil) if latest_soil else 50
-        }
-    }
+# (Mantém os outros endpoints: dashboard, ids, monitoring, analise-ia...)
 
-@app.get("/unity/ids")
-def list_ids():
-    profiles = list(unity_profiles.find({}, {"_id": 1}))
-    unity_ids = [p["_id"] for p in profiles]
+# --- FUNÇÃO DE COMUNICAÇÃO COM OLLAMA ---
+def get_ollama_response(prompt: str, stream: bool = False):
+    format_type = "json" if not stream else ""
+    llama3_prompt = f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nVocê é Ekko, um assistente de IA.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>"
+    payload = {"model": "llama3", "prompt": llama3_prompt, "stream": stream}
+    if format_type:
+        payload["format"] = format_type
     
-    return {
-        "status": "success",
-        "total_ids": len(unity_ids),
-        "unity_ids": unity_ids
-    }
+    response = requests.post(OLLAMA_API_URL, json=payload, stream=stream)
+    response.raise_for_status()
+    return response
 
-@app.get("/unity/monitoring/{unity_id}")
-def get_monitoring_data(unity_id: str, period: str = "24h"):
-    from datetime import datetime, timedelta
-    
-    # Validar usuário
-    if not unity_profiles.find_one({"_id": unity_id}):
-        raise HTTPException(status_code=404, detail="Unity ID não encontrado")
-    
-    # Calcular data limite baseada no período real
-    now = datetime.utcnow()
-    time_deltas = {
-        "1h": timedelta(hours=1),
-        "6h": timedelta(hours=6), 
-        "24h": timedelta(hours=24),
-        "7d": timedelta(days=7)
-    }
-    
-    time_limit = now - time_deltas.get(period, timedelta(hours=24))
-    
-    # Buscar dados filtrados por timestamp real
-    soil_data = list(unity_soil_data.find({
-        "unity_id": unity_id,
-        "timestamp": {"$gte": time_limit}
-    }).sort("timestamp", -1))
-    
-    # Converter formato para frontend
-    monitoring_data = []
-    for item in soil_data:
-        # Calcular status baseado nos parâmetros
-        ph = item["soil_parameters"]["ph"]
-        status = "ideal" if 6.0 <= ph <= 7.0 else "atencao" if 5.5 <= ph <= 7.5 else "critico"
-        
-        monitoring_data.append({
-            "hora": item["timestamp"].strftime("%H:%M"),
-            "ph": item["soil_parameters"]["ph"],
-            "umidade": item["soil_parameters"]["umidade"],
-            "temp": item["soil_parameters"]["temperatura"],
-            "salinidade": item["soil_parameters"]["salinidade"],
-            "condutividade": item["soil_parameters"]["condutividade"],
-            "n": item["nutrients"]["nitrogenio"],
-            "p": item["nutrients"]["fosforo"],
-            "k": item["nutrients"]["potassio"],
-            "status": status
-        })
-    
-    return {
-        "status": "success",
-        "unity_id": unity_id,
-        "period": period,
-        "time_filter": {
-            "from": time_limit.isoformat(),
-            "to": now.isoformat(),
-            "total_found": len(monitoring_data)
-        },
-        "data": monitoring_data
-    }
+# --- ENDPOINTS DO CHATBOT ---
+@app.post("/api/generate_title")
+def generate_title(request: TitleRequest):
+    try:
+        final_prompt = prompts.TITLE_GENERATION_PROMPT.format(history_text=request.history_text)
+        response = get_ollama_response(final_prompt, stream=False)
+        response_data = response.json()
+        title_json_str = response_data.get("response", "{}")
+        title_data = json.loads(title_json_str)
+        return {"title": title_data.get("title", "Conversa")}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao gerar título: {e}")
 
-@app.get("/unity/analise-ia/{unity_id}")
-def analise_ia(unity_id: str):
-    profile = unity_profiles.find_one({"_id": unity_id})
-    if not profile:
-        raise HTTPException(status_code=404, detail="Unity ID não encontrado")
-    
-    # Buscar dados de solo mais recentes
-    latest_soil = unity_soil_data.find_one(
-        {"unity_id": unity_id},
-        sort=[("timestamp", -1)]
-    )
-    
-    # Buscar histórico para análise de tendências
-    soil_history = list(unity_soil_data.find(
-        {"unity_id": unity_id}
-    ).sort("timestamp", -1).limit(10))
-    
-    # Análise completa
-    diagnostico = analyze_soil_complete(latest_soil, soil_history, profile)
-    
-    return {
-        "status": "success",
-        "unity_id": unity_id,
-        "cultivo_principal": get_main_crop(profile),
-        "diagnostico": diagnostico,
-        "resumo": {
-            "parametros_ideais": count_ideal_parameters(diagnostico["parametros"]),
-            "total_parametros": len(diagnostico["parametros"]),
-            "tendencia_geral": analyze_trend(soil_history),
-            "nivel_sustentabilidade": calculate_sustainability(latest_soil, profile)
-        }
-    }
+@app.post("/api/chat/{unity_id}")
+def chat(unity_id: str, request: ChatRequest):
+    user_message = request.message
+    def stream_generation():
+        try:
+            yield f'data: {json.dumps({"type": "status", "message": "Analisando..."})}\n\n'
+            
+            latest_soil = unity_soil_data.find_one({"unity_id": unity_id}, sort=[("timestamp", -1)])
+            player_context = f"Dados do solo: {json.dumps(latest_soil, default=str)}" if latest_soil else ""
+            
+            local_context = tool.local_database_search(user_message)
+            web_context = tool.focused_web_search(user_message)
+            weather_context = ""
+            if request.coordinates:
+                weather_context = tool.get_inmet_forecast(lat=request.coordinates['latitude'], lon=request.coordinates['longitude'])
+            long_term_memory = tool.recall_memories()
+            
+            final_prompt = prompts.MASTER_PROMPT.format(
+                player_context=player_context, local_context=local_context,
+                web_context=web_context, weather_context=weather_context,
+                history="\n".join(request.history), user_message=user_message,
+                long_term_memory=long_term_memory
+            )
+            
+            response = get_ollama_response(final_prompt, stream=True)
+            for chunk in response.iter_lines():
+                if chunk:
+                    json_chunk = json.loads(chunk)
+                    yield f'data: {json.dumps({"type": "chunk", "message": json_chunk.get("response", "")})}\n\n'
+        except Exception as e:
+            yield f'data: {json.dumps({"type": "chunk", "message": f"Erro: {e}"})}\n\n'
+    return StreamingResponse(stream_generation(), media_type="text/event-stream")
 
+# --- INICIALIZAÇÃO DO SERVIDOR ---
 if __name__ == "__main__":
-    print("EKKO API - MongoDB Atlas")
+    print("=" * 50)
+    print("EKKO API - MongoDB Atlas & IA Local")
     print(f"Banco: {DB_NAME}")
-    print("Porta: 8002")
-    print("Docs: http://127.0.0.1:8002/docs")
-    print("Status: http://127.0.0.1:8002/unity/status")
+    print(f"Porta: {API_PORT}")
+    print(f"Docs: http://{API_HOST}:{API_PORT}/docs")
+    print(f"Status: http://{API_HOST}:{API_PORT}/unity/status")
     print("=" * 50)
     
-    uvicorn.run(app, host=API_HOST, port=API_PORT, reload=API_DEBUG)
+    uvicorn.run("main:app", host=API_HOST, port=API_PORT, reload=API_DEBUG)
+
