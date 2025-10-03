@@ -331,6 +331,9 @@ class ChatRequest(BaseModel):
     history: Optional[list] = []
     coordinates: Optional[Dict[str, float]] = None
 
+class TitleRequest(BaseModel):
+    message: str
+
 @app.post("/api/chat/{unity_id}")
 def chat(unity_id: str, request: ChatRequest):
     user_message = request.message
@@ -362,7 +365,7 @@ def chat(unity_id: str, request: ChatRequest):
                 print("--> A recolher contexto de Clima (INMET)...")
                 weather_context = tool.get_inmet_forecast(lat=request.coordinates['latitude'], lon=request.coordinates['longitude'])
                 print(f"--> Contexto Clima: {weather_context[:100]}...")
-            
+                
             long_term_memory = tool.recall_memories()
 
             # ETAPA 2: MONTAGEM DO PROMPT
@@ -381,8 +384,13 @@ def chat(unity_id: str, request: ChatRequest):
             print("-> A receber streaming da IA e a enviar para o frontend...")
             for chunk in response.iter_lines():
                 if chunk:
-                    json_chunk = json.loads(chunk)
-                    yield f'data: {json.dumps({"type": "chunk", "message": json_chunk.get("response", "")})}\n\n'
+                    try:
+                        json_chunk = json.loads(chunk)
+                        message = json_chunk.get("message", {}).get("content", "")
+                        if message:
+                            yield f'data: {json.dumps({"type": "chunk", "message": message})}\n\n'
+                    except json.JSONDecodeError:
+                        continue
             
             print("--- FIM DO FLUXO DE CHAT ---")
         
@@ -394,6 +402,23 @@ def chat(unity_id: str, request: ChatRequest):
             yield f'data: {json.dumps({"type": "chunk", "message": "Ocorreu um erro crítico no meu processamento. Verifique o terminal do servidor."})}\n\n'
 
     return StreamingResponse(stream_generation(), media_type='text/event-stream')
+
+@app.post("/api/generate_title")
+def generate_title(request: TitleRequest):
+    try:
+        prompt = f"Gere um título curto (máximo 5 palavras) para esta pergunta sobre agricultura: '{request.message}'"
+        response = ai_connector.get_ollama_response(prompt, stream=False)
+        data = response.json()
+        title = data.get('message', {}).get('content', 'Nova Conversa')
+        
+        # Limpar e encurtar o título
+        title = title.strip().replace('"', '').replace("'", '')
+        words = title.split()[:4]  # Máximo 4 palavras
+        final_title = ' '.join(words)
+        
+        return {"title": final_title}
+    except Exception as e:
+        return {"title": "Nova Conversa"}
 
 if __name__ == "__main__":
     print("EKKO API - MongoDB Atlas")

@@ -205,6 +205,9 @@
     line-height: 1.5;
     word-wrap: break-word;
     animation: fadeIn 0.4s ease-out;
+    margin-bottom: 10px;
+    display: block;
+    clear: both;
 }
 
 .ekko-chat-box .user-message {

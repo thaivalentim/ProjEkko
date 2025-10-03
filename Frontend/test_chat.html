@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Chat EKKO</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
+        h1 { color: #22C55E; margin-bottom: 20px; }
+        .chat-box { height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; background: #fafafa; }
+        .message { margin-bottom: 10px; padding: 10px; border-radius: 8px; }
+        .user-message { background: #007bff; color: white; text-align: right; }
+        .bot-message { background: #e4e6eb; color: #333; }
+        .status-message { background: #fff3cd; color: #856404; text-align: center; font-style: italic; }
+        .input-area { display: flex; gap: 10px; }
+        input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 20px; background: #22C55E; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #16A34A; }
+        .info { background: #e3f2fd; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌱 Teste Chat EKKO</h1>
+        
+        <div class="info">
+            <strong>Unity ID:</strong> <span id="unity-id">Carregando...</span><br>
+            <strong>Status:</strong> <span id="status">Verificando...</span>
+        </div>
+        
+        <div class="chat-box" id="chat-box">
+            <div class="message bot-message">Olá! Sou o Ekko. Faça uma pergunta sobre agricultura!</div>
+        </div>
+        
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Digite sua pergunta..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        const unityId = localStorage.getItem('unityId') || 'unity_test123';
+        const API_URL = `http://127.0.0.1:8002/api/chat/${unityId}`;
+        
+        document.getElementById('unity-id').textContent = unityId;
+        
+        // Verificar status da API
+        fetch('http://127.0.0.1:8002/unity/status')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('status').textContent = data.status === 'online' ? '✅ Online' : '❌ Offline';
+            })
+            .catch(() => {
+                document.getElementById('status').textContent = '❌ Erro de conexão';
+            });
+        
+        function addMessage(text, type) {
+            const chatBox = document.getElementById('chat-box');
+            const msg = document.createElement('div');
+            msg.className = `message ${type}-message`;
+            msg.textContent = text;
+            chatBox.appendChild(msg);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return msg;
+        }
+        
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const question = input.value.trim();
+            if (!question) return;
+            
+            addMessage(question, 'user');
+            input.value = '';
+            
+            const statusMsg = addMessage('⚙️ Processando...', 'status');
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: question, history: [], coordinates: null })
+                });
+                
+                statusMsg.remove();
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let botMsg = addMessage('', 'bot');
+                let fullText = '';
+                
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n\n');
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.substring(6));
+                                if (data.type === 'chunk' && data.message) {
+                                    fullText += data.message;
+                                    botMsg.textContent = fullText;
+                                }
+                            } catch (e) { }
+                        }
+                    }
+                }
+            } catch (error) {
+                statusMsg.remove();
+                addMessage('❌ Erro: ' + error.message, 'status');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,22 +1,35 @@
-# Arquivo: ai_connector.py
 import requests
 import json
 
-# A sua conexão com a IA Local (Ollama)
 OLLAMA_API_URL = "http://localhost:11434/api/generate"
+OLLAMA_CHAT_URL = "http://localhost:11434/api/chat"
+
+def test_ollama_connection():
+    try:
+        response = requests.get("http://localhost:11434/api/tags", timeout=5)
+        return response.status_code == 200
+    except:
+        return False
 
 def get_ollama_response(prompt: str, stream: bool = False):
-    print(f"--- CONECTOR IA: A preparar o prompt para o Llama 3 ---")
-    format_type = "json" if not stream else ""
+    if not test_ollama_connection():
+        raise Exception("Ollama não está rodando! Execute: ollama serve")
     
-    # Formato de prompt específico para o Llama 3
-    llama3_prompt = f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nVocê é Ekko, um assistente de IA.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>"
-    payload = {"model": "llama3", "prompt": llama3_prompt, "stream": stream}
-    if format_type: 
-        payload["format"] = format_type
+    print(f"--- CONECTOR IA: Enviando para llama3.2 (Stream: {stream}) ---")
     
-    print(f"--- CONECTOR IA: A enviar pedido para {OLLAMA_API_URL} (Stream: {stream}) ---")
-    response = requests.post(OLLAMA_API_URL, json=payload, stream=stream)
-    response.raise_for_status()
-    print(f"--- CONECTOR IA: Resposta recebida do Ollama ---")
-    return response
+    payload = {
+        "model": "llama3.2",
+        "messages": [
+            {"role": "system", "content": "Você é Ekko, assistente de agricultura."},
+            {"role": "user", "content": prompt}
+        ],
+        "stream": stream
+    }
+    
+    try:
+        response = requests.post(OLLAMA_CHAT_URL, json=payload, stream=stream, timeout=30)
+        response.raise_for_status()
+        return response
+    except Exception as e:
+        print(f"ERRO Ollama: {e}")
+        raise

@@ -26,9 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
     
     // --- CONFIGURAÇÃO ---
-    const unityId = localStorage.getItem("unity_id") || "default_user"; 
+    const unityId = localStorage.getItem("unityId") || "default_user"; 
     const API_URL_CHAT = `http://127.0.0.1:8002/api/chat/${unityId}`;
     const API_URL_TITLE = `http://127.0.0.1:8002/api/generate_title`;
+    
+    console.log("Unity ID:", unityId);
+    console.log("API Chat URL:", API_URL_CHAT);
 
     // --- ESTADO DA APLICAÇÃO ---
     let userCoordinates = null;
@@ -194,9 +197,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function addUserMessage(message) {
+        console.log('Adicionando mensagem do usuário:', message);
         const userMsgHtml = `<div class="message user-message">${message}</div>`;
         sessions[activeSessionId].history += userMsgHtml;
         chatBox.innerHTML = sessions[activeSessionId].history;
+        console.log('HTML do chat atualizado');
         smoothScrollToBottom();
     }
     
@@ -229,9 +234,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function sendMessage() {
         const question = userInput.value.trim();
-        if (question === '' || isLoading) return;
+        console.log('sendMessage chamado, pergunta:', question);
+        if (question === '' || isLoading) {
+            console.log('Mensagem vazia ou já carregando');
+            return;
+        }
 
         isLoading = true;
+        console.log('Adicionando mensagem do usuário...');
         addUserMessage(question);
         userInput.value = '';
         userInput.focus();
@@ -303,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(API_URL_TITLE, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ history_text: historyText })
+                body: JSON.stringify({ message: historyText })
             });
             const data = await response.json();
             if (data.title) {
