@@ -22,5 +22,5 @@ Histórico: {history}
 
 Pergunta: {user_message}
 
-Resposta (máximo 150 palavras):
+Resposta:
 """

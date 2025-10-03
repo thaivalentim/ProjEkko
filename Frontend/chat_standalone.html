@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EKKO Chat - Teste Standalone</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/chat_bot_v2.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #27ae60;
+        }
+        .header p {
+            font-size: 1.1em;
+            color: #666;
+        }
+        .info-bar {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .info-item i {
+            color: #27ae60;
+        }
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        .status-online {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌱 EKKO Chat Bot</h1>
+            <p>Assistente Inteligente de Agricultura</p>
+        </div>
+
+        <div class="info-bar">
+            <div class="info-item">
+                <i class="fas fa-user"></i>
+                <span><strong>Unity ID:</strong> <span id="unity-id">Carregando...</span></span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-server"></i>
+                <span><strong>API:</strong> <span id="api-status" class="status-badge">Verificando...</span></span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-robot"></i>
+                <span><strong>Llama:</strong> <span id="llama-status" class="status-badge">Verificando...</span></span>
+            </div>
+        </div>
+
+        <section id="chatbot-section">
+            <div class="ekko-chat-wrapper" id="ekko-chat-wrapper">
+                <div class="history-sidebar" id="history-sidebar">
+                    <div class="sidebar-header">
+                        <h3>Histórico</h3>
+                        <button class="new-session-btn" id="new-session-btn" title="Nova Conversa">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <ul class="history-list" id="history-list"></ul>
+                </div>
+
+                <div class="sidebar-toggle">
+                    <button class="toggle-sidebar-btn" id="toggle-sidebar-btn" title="Recolher/Expandir">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+
+                <div class="ekko-chat-container">
+                    <div class="ekko-chat-header-main">
+                        <div class="header-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3>Assistente Ekko</h3>
+                    </div>
+                    <div class="ekko-chat-box" id="ekko-chat-box"></div>
+                    <div class="ekko-input-container">
+                        <input type="text" id="ekko-user-input" placeholder="Pergunte ao Ekko...">
+                        <button id="ekko-send-btn" title="Enviar">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="js/chat_bot_v2.js"></script>
+    <script>
+        // Verificar status da API
+        const unityId = localStorage.getItem('unityId') || 'unity_test123';
+        document.getElementById('unity-id').textContent = unityId;
+
+        fetch('http://127.0.0.1:8002/unity/status')
+            .then(r => r.json())
+            .then(data => {
+                const badge = document.getElementById('api-status');
+                if (data.status === 'online') {
+                    badge.textContent = 'Online';
+                    badge.className = 'status-badge status-online';
+                } else {
+                    badge.textContent = 'Offline';
+                    badge.className = 'status-badge status-offline';
+                }
+            })
+            .catch(() => {
+                const badge = document.getElementById('api-status');
+                badge.textContent = 'Erro';
+                badge.className = 'status-badge status-offline';
+            });
+
+        // Verificar Ollama
+        fetch('http://127.0.0.1:11434/api/tags')
+            .then(r => r.json())
+            .then(data => {
+                const badge = document.getElementById('llama-status');
+                const hasLlama = data.models.some(m => m.name.includes('llama'));
+                if (hasLlama) {
+                    badge.textContent = 'Online';
+                    badge.className = 'status-badge status-online';
+                } else {
+                    badge.textContent = 'Sem modelo';
+                    badge.className = 'status-badge status-offline';
+                }
+            })
+            .catch(() => {
+                const badge = document.getElementById('llama-status');
+                badge.textContent = 'Offline';
+                badge.className = 'status-badge status-offline';
+            });
+    </script>
+</body>
+</html>

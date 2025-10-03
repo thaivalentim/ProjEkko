@@ -14,7 +14,7 @@ load_dotenv()
 MONGO_URI = os.getenv("UNITY_MONGO_URI")
 DB_NAME = os.getenv("UNITY_MONGO_DB_NAME", "EKKOnUnity")
 API_HOST = os.getenv("API_HOST", "0.0.0.0")
-API_PORT = int(os.getenv("API_PORT", "8003"))
+API_PORT = int(os.getenv("API_PORT", "8002"))
 API_DEBUG = os.getenv("API_DEBUG", "False").lower() == "true"
 
 if not MONGO_URI:
