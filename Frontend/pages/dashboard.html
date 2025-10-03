@@ -10,10 +10,12 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="../css/dashboard.css">
     <link rel="stylesheet" href="../css/monitoring.css">
     <link rel="stylesheet" href="../css/correlations.css">
     <link rel="stylesheet" href="../css/chat_bot.css">
+    <link rel="stylesheet" href="../css/modal.css">
 </head>
 <body>
     <aside class="sidebar" id="sidebar">
@@ -218,6 +220,18 @@
             </section>
         </div>
     </main>
+
+    <!-- Modal de Confirmação -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content">
+            <h3>Confirmar Ação</h3>
+            <p id="confirm-modal-text"></p>
+            <div class="modal-buttons">
+                <button id="cancel-delete-btn" class="btn-secondary">Cancelar</button>
+                <button id="confirm-delete-btn" class="btn-danger">Apagar</button>
+            </div>
+        </div>
+    </div>
 
     <script src="../js/correlation-engine.js"></script>
     <script src="../js/monitoring.js"></script>

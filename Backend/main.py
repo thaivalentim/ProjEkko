@@ -332,6 +332,9 @@ class ChatRequest(BaseModel):
     history: Optional[list] = []
     coordinates: Optional[Dict[str, float]] = None
 
+class TitleRequest(BaseModel):
+    message: str
+
 @app.post("/api/chat/{unity_id}")
 def chat(unity_id: str, request: ChatRequest):
     user_message = request.message
@@ -363,7 +366,7 @@ def chat(unity_id: str, request: ChatRequest):
                 print("--> A recolher contexto de Clima (INMET)...")
                 weather_context = tool.get_inmet_forecast(lat=request.coordinates['latitude'], lon=request.coordinates['longitude'])
                 print(f"--> Contexto Clima: {weather_context[:100]}...")
-            
+                
             long_term_memory = tool.recall_memories()
 
             # ETAPA 2: MONTAGEM DO PROMPT
@@ -382,8 +385,13 @@ def chat(unity_id: str, request: ChatRequest):
             print("-> A receber streaming da IA e a enviar para o frontend...")
             for chunk in response.iter_lines():
                 if chunk:
-                    json_chunk = json.loads(chunk)
-                    yield f'data: {json.dumps({"type": "chunk", "message": json_chunk.get("response", "")})}\n\n'
+                    try:
+                        json_chunk = json.loads(chunk)
+                        message = json_chunk.get("message", {}).get("content", "")
+                        if message:
+                            yield f'data: {json.dumps({"type": "chunk", "message": message})}\n\n'
+                    except json.JSONDecodeError:
+                        continue
             
             print("--- FIM DO FLUXO DE CHAT ---")
         
@@ -396,80 +404,23 @@ def chat(unity_id: str, request: ChatRequest):
 
     return StreamingResponse(stream_generation(), media_type='text/event-stream')
 
-@app.get("/unity/recreate-test-data")
-def recreate_test_data():
-    """Criar dados de teste para demonstração"""
+@app.post("/api/generate_title")
+def generate_title(request: TitleRequest):
     try:
-        # Limpar dados existentes
-        unity_profiles.delete_many({"_id": "unity_test123"})
-        unity_soil_data.delete_many({"unity_id": "unity_test123"})
+        prompt = f"Gere um título curto (máximo 5 palavras) para esta pergunta sobre agricultura: '{request.message}'"
+        response = ai_connector.get_ollama_response(prompt, stream=False)
+        data = response.json()
+        title = data.get('message', {}).get('content', 'Nova Conversa')
         
-        # Criar perfil de teste
-        test_profile = {
-            "_id": "unity_test123",
-            "dados_pessoais": {
-                "nome": "João Silva",
-                "email": "joao@fazenda.com",
-                "telefone": "(35) 99999-9999",
-                "cpf": "123.456.789-00"
-            },
-            "propriedade": {
-                "nome": "Fazenda São João",
-                "area_hectares": 50,
-                "localizacao": "Santa Rita do Sapucaí, MG",
-                "cultivos_principais": ["Café", "Milho"]
-            },
-            "unity_stats": {
-                "total_sessions": 12,
-                "best_score": 850,
-                "total_playtime": 720
-            },
-            "created_at": datetime.utcnow(),
-            "status": "active"
-        }
+        # Limpar e encurtar o título
+        title = title.strip().replace('"', '').replace("'", '')
+        words = title.split()[:4]  # Máximo 4 palavras
+        final_title = ' '.join(words)
         
-        # Inserir perfil
-        unity_profiles.insert_one(test_profile)
-        
-        # Criar dados de solo de teste
-        soil_data = {
-            "_id": f"soil_unity_test123_{int(datetime.utcnow().timestamp())}",
-            "unity_id": "unity_test123",
-            "timestamp": datetime.utcnow(),
-            "soil_parameters": {
-                "ph": 6.5,
-                "umidade": 55.0,
-                "temperatura": 25.0,
-                "salinidade": 400.0,
-                "condutividade": 1.2
-            },
-            "nutrients": {
-                "nitrogenio": 120.0,
-                "fosforo": 80.0,
-                "potassio": 150.0
-            },
-            "game_metrics": {
-                "score": 750,
-                "money_spent": 240.0,
-                "sustainability_index": 0.75
-            },
-            "cultivo_atual": "Milho",
-            "health_score": 75
-        }
-        
-        unity_soil_data.insert_one(soil_data)
-        
-        return {
-            "status": "success",
-            "message": "Dados de teste criados",
-            "test_unity_id": "unity_test123"
-        }
-        
+        return {"title": final_title}
     except Exception as e:
-        return {
-            "status": "error",
-            "message": f"Erro: {str(e)}"
-        }
+        return {"title": "Nova Conversa"}
+
 if __name__ == "__main__":
     print("EKKO API - MongoDB Atlas")
     print(f"Banco: {DB_NAME}")
