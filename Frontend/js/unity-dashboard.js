@@ -1449,7 +1449,8 @@ const UnityDashboard = {
             'heatmap': 'Relatórios',
             'readings': 'Simulação',
             'development': 'Sobre o Sistema',
-            'monitoring': 'Supervisionamento'
+            'monitoring': 'Supervisão',
+            'chatbot': 'Chatbot'
         };
         
         const contextualInfo = {
@@ -1459,7 +1460,7 @@ const UnityDashboard = {
             'heatmap': 'Visualizações detalhadas dos dados coletados durante a simulação',
             'readings': 'Histórico completo das suas sessões de jogo e performance',
             'development': 'Documentação técnica',
-            'monitoring': 'Monitoramento',
+            'monitoring': 'Acompanhe em tempo real os dados coletados por tecnologia IoT simulada',
             'chatbot': 'Converse com nossa IA especializada em agricultura sustentável'
         };
         
