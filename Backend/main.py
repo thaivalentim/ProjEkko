@@ -3,6 +3,7 @@ EKKO - API Principal
 FastAPI com MongoDB Atlas
 """
 
+# Imports do sistema e de bibliotecas
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
