@@ -7,7 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("Módulo do Chatbot Ekko não ativo nesta página.");
         return;
     }
-    console.log("Módulo do Chatbot Ekko inicializado com sucesso.");
+    // --- CONFIGURAÇÃO ---
+    const unityId = localStorage.getItem("unityId") || "default_user";
+    
+    console.log("=== Módulo do Chatbot Ekko ===");
+    console.log("Unity ID:", unityId);
+    console.log("Chave de sessões:", `ekkoChatSessions_${unityId}`);
+    console.log("================================");
 
     // --- ELEMENTOS DA INTERFACE (DOM) ---
     const chatWrapper = document.getElementById('ekko-chat-wrapper');
@@ -25,13 +31,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
     const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
     
-    // --- CONFIGURAÇÃO ---
-    const unityId = localStorage.getItem("unityId") || "default_user"; 
+    if (!unityId || unityId === "null" || unityId === "undefined") {
+        console.error("Unity ID inválido!");
+        alert("Erro: Unity ID não encontrado. Faça login novamente.");
+        return;
+    }
+    
     const API_URL_CHAT = `http://127.0.0.1:8002/api/chat/${unityId}`;
     const API_URL_TITLE = `http://127.0.0.1:8002/api/generate_title`;
-    
-    console.log("Unity ID:", unityId);
-    console.log("API Chat URL:", API_URL_CHAT);
 
     // --- ESTADO DA APLICAÇÃO ---
     let userCoordinates = null;
@@ -43,36 +50,58 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupSidebarToggle() {
         if (!toggleSidebarBtn || !chatWrapper) return;
         
-        // Verifica se o estado estava guardado no navegador
-        if (localStorage.getItem('ekkoSidebarCollapsed') === 'true') {
+        const sidebarKey = `ekkoSidebarCollapsed_${unityId}`;
+        
+        if (localStorage.getItem(sidebarKey) === 'true') {
             chatWrapper.classList.add('sidebar-collapsed');
         }
 
         toggleSidebarBtn.addEventListener('click', () => {
             chatWrapper.classList.toggle('sidebar-collapsed');
-            // Guarda a preferência do utilizador para a próxima visita
-            localStorage.setItem('ekkoSidebarCollapsed', chatWrapper.classList.contains('sidebar-collapsed'));
+            localStorage.setItem(sidebarKey, chatWrapper.classList.contains('sidebar-collapsed'));
         });
     }
 
     // --- LÓGICA DE GESTÃO DE SESSÕES ---
 
     function loadSessions() {
-        const storedSessions = localStorage.getItem('ekkoChatSessions');
-        sessions = storedSessions ? JSON.parse(storedSessions) : {};
-        activeSessionId = localStorage.getItem('ekkoActiveSessionId');
+        try {
+            const storageKey = `ekkoChatSessions_${unityId}`;
+            const activeKey = `ekkoActiveSessionId_${unityId}`;
+            
+            console.log("Carregando sessões com chave:", storageKey);
+            
+            const storedSessions = localStorage.getItem(storageKey);
+            sessions = storedSessions ? JSON.parse(storedSessions) : {};
+            activeSessionId = localStorage.getItem(activeKey);
+            
+            console.log("Sessões carregadas:", Object.keys(sessions).length);
 
-        if (Object.keys(sessions).length === 0 || !sessions[activeSessionId]) {
+            if (Object.keys(sessions).length === 0 || !sessions[activeSessionId]) {
+                console.log("Criando nova sessão...");
+                createNewSession();
+            } else {
+                renderHistorySidebar();
+                loadSession(activeSessionId);
+            }
+        } catch (error) {
+            console.error("Erro ao carregar sessões:", error);
             createNewSession();
-        } else {
-            renderHistorySidebar();
-            loadSession(activeSessionId);
         }
     }
 
     function saveSessions() {
-        localStorage.setItem('ekkoChatSessions', JSON.stringify(sessions));
-        localStorage.setItem('ekkoActiveSessionId', activeSessionId);
+        try {
+            const storageKey = `ekkoChatSessions_${unityId}`;
+            const activeKey = `ekkoActiveSessionId_${unityId}`;
+            
+            localStorage.setItem(storageKey, JSON.stringify(sessions));
+            localStorage.setItem(activeKey, activeSessionId);
+            
+            console.log("Sessões salvas:", storageKey);
+        } catch (error) {
+            console.error("Erro ao salvar sessões:", error);
+        }
     }
 
     function renderHistorySidebar() {
@@ -120,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const sessionNumber = Object.keys(sessions).length + 1;
         sessions[newSessionId] = {
             title: `Nova Conversa ${sessionNumber}`,
-            history: '<div class="message bot-message">Olá! Sou o Ekko. Como posso ajudar nesta nova conversa?</div>'
+            history: ''
         };
         loadSession(newSessionId);
     }
@@ -218,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(!element) return;
         const fullText = (element.dataset.fullText || '') + newTextChunk;
         element.dataset.fullText = fullText;
-        element.innerHTML = marked.parse(fullText);
+        element.textContent = fullText;
         // Atualiza o histórico com o conteúdo HTML renderizado para manter a formatação
         sessions[activeSessionId].history = chatBox.innerHTML;
         smoothScrollToBottom();
@@ -317,7 +346,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await response.json();
             if (data.title) {
-                sessions[sessionId].title = data.title;
+                let title = data.title.substring(0, 20);
+                if (data.title.length > 20) title += '...';
+                sessions[sessionId].title = title;
                 saveSessions();
                 renderHistorySidebar();
             }
@@ -361,8 +392,8 @@ document.addEventListener('DOMContentLoaded', () => {
             sendMessage();
         }
     });
-    locationBtn.addEventListener('click', getLocation);
+    if (locationBtn) locationBtn.addEventListener('click', getLocation);
     
-    setupSidebarToggle(); // Ativa a funcionalidade da sidebar
-    loadSessions(); // Inicia todo o sistema de sessões
+    setupSidebarToggle();
+    loadSessions();
 });

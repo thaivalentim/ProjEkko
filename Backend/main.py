@@ -347,9 +347,30 @@ def chat(unity_id: str, request: ChatRequest):
             yield f'data: {json.dumps({"type": "status", "message": "Recolhendo dados..."})}\n\n'
             
             print("--> A recolher contexto do MongoDB...")
+            profile = unity_profiles.find_one({"_id": unity_id})
             latest_soil = unity_soil_data.find_one({"unity_id": unity_id}, sort=[("timestamp", -1)])
-            player_context = f"Dados do solo do jogador: {json.dumps(latest_soil, default=str)}" if latest_soil else ""
-            print(f"--> Contexto MongoDB: {player_context[:100]}...")
+            
+            player_context = ""
+            if profile:
+                player_context += f"AGRICULTOR: {profile.get('dados_pessoais', {}).get('nome', 'N/A')}\n"
+                player_context += f"PROPRIEDADE: {profile.get('propriedade', {}).get('nome', 'N/A')}\n"
+                player_context += f"ÁREA: {profile.get('propriedade', {}).get('area_hectares', 0)} hectares\n"
+                player_context += f"CULTIVO: {profile.get('propriedade', {}).get('cultivo_principal', 'N/A')}\n\n"
+            
+            if latest_soil:
+                player_context += f"DADOS DO SOLO (mais recente):\n"
+                player_context += f"- pH: {latest_soil.get('soil_parameters', {}).get('ph', 'N/A')}\n"
+                player_context += f"- Umidade: {latest_soil.get('soil_parameters', {}).get('umidade', 'N/A')}%\n"
+                player_context += f"- Temperatura: {latest_soil.get('soil_parameters', {}).get('temperatura', 'N/A')}°C\n"
+                player_context += f"- NPK: N={latest_soil.get('nutrients', {}).get('nitrogenio', 'N/A')}, "
+                player_context += f"P={latest_soil.get('nutrients', {}).get('fosforo', 'N/A')}, "
+                player_context += f"K={latest_soil.get('nutrients', {}).get('potassio', 'N/A')}\n"
+                player_context += f"- Cultivo atual: {latest_soil.get('cultivo_atual', 'N/A')}\n"
+            
+            if not player_context:
+                player_context = "Nenhum dado disponível para este agricultor."
+            
+            print(f"--> Contexto MongoDB: {player_context[:150]}...")
 
             print("--> A recolher contexto da base local (RAG)...")
             local_context = tool.local_database_search(user_message)
@@ -371,10 +392,12 @@ def chat(unity_id: str, request: ChatRequest):
             # ETAPA 2: MONTAGEM DO PROMPT
             print("-> A montar o prompt mestre...")
             final_prompt = prompts.MASTER_PROMPT.format(
-                player_context=player_context, local_context=local_context,
-                web_context=web_context, weather_context=weather_context,
-                history="\n".join(request.history), user_message=user_message,
-                long_term_memory=long_term_memory
+                player_context=player_context, 
+                local_context=local_context,
+                web_context=web_context, 
+                weather_context=weather_context,
+                history="\n".join(request.history), 
+                user_message=user_message
             )
 
             # ETAPA 3: EXECUÇÃO E STREAMING
@@ -406,19 +429,55 @@ def chat(unity_id: str, request: ChatRequest):
 @app.post("/api/generate_title")
 def generate_title(request: TitleRequest):
     try:
-        prompt = f"Gere um título curto (máximo 5 palavras) para esta pergunta sobre agricultura: '{request.message}'"
+        prompt = f"Gere um título de 2-3 palavras para: '{request.message[:50]}'"
         response = ai_connector.get_ollama_response(prompt, stream=False)
         data = response.json()
         title = data.get('message', {}).get('content', 'Nova Conversa')
         
-        # Limpar e encurtar o título
-        title = title.strip().replace('"', '').replace("'", '')
-        words = title.split()[:4]  # Máximo 4 palavras
+        title = title.strip().replace('"', '').replace("'", '').replace(':', '')
+        words = title.split()[:3]
         final_title = ' '.join(words)
         
         return {"title": final_title}
     except Exception as e:
         return {"title": "Nova Conversa"}
+
+class SoilTipRequest(BaseModel):
+    parametro: str
+    valor: float
+    cultivo: str
+
+@app.post("/api/soil-tips/{unity_id}")
+def get_soil_tips(unity_id: str, request: SoilTipRequest):
+    try:
+        profile = unity_profiles.find_one({"_id": unity_id})
+        cultivo = request.cultivo or profile.get('propriedade', {}).get('cultivo_principal', 'cultivo geral')
+        
+        prompt = f"""Você é um especialista em agricultura. Dê 3 dicas práticas de como melhorar o {request.parametro} do solo para cultivo de {cultivo}. Valor atual: {request.valor}.
+
+Formate assim:
+1. [Dica 1]
+2. [Dica 2]
+3. [Dica 3]
+
+Seja direto e prático. Máximo 150 palavras."""
+        
+        response = ai_connector.get_ollama_response(prompt, stream=False)
+        data = response.json()
+        tips = data.get('message', {}).get('content', 'Dicas não disponíveis')
+        
+        return {"tips": tips}
+    except Exception as e:
+        return {"tips": "Erro ao gerar dicas. Tente novamente."}
+
+@app.get("/unity/recreate-test-data")
+def recreate_test_data():
+    from criar_dados_teste import criar_dados_teste
+    try:
+        criar_dados_teste()
+        return {"status": "success", "message": "Dados de teste recriados"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
 if __name__ == "__main__":
     print("EKKO API - MongoDB Atlas")

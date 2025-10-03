@@ -1055,12 +1055,12 @@ const UnityDashboard = {
                             </div>
                             
                             <!-- Recomendação -->
-                            <div style="background: linear-gradient(135deg, ${this.getStatusColor(data.status)}, ${this.getStatusColorDark(data.status)}); padding: 1.25rem; border-radius: 8px; color: white;">
+                            <button onclick="UnityDashboard.showSoilTips('${param}', ${data.valor}, '${this.getParametroNome(param)}')" style="width: 100%; background: linear-gradient(135deg, ${this.getStatusColor(data.status)}, ${this.getStatusColorDark(data.status)}); padding: 1.25rem; border-radius: 8px; color: white; border: none; cursor: pointer; text-align: left; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
                                 <h5 style="margin-bottom: 0.75rem; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
-                                    <i class="fas fa-lightbulb"></i> Ação Recomendada
+                                    <i class="fas fa-lightbulb"></i> Ver Dicas de Melhoria
                                 </h5>
                                 <p style="font-size: 0.9rem; margin: 0; line-height: 1.5; font-weight: 500;">${data.sugestao}</p>
-                            </div>
+                            </button>
                         </div>
                     `).join('')}
                 </div>
@@ -1730,7 +1730,7 @@ const UnityDashboard = {
                 <h3 style="color: var(--tech-blue); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.4rem;">
                     <i class="fas fa-layer-group"></i> Stack Tecnológico
                 </h3>
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;">
+                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.5rem;">
                     <div style="text-align: center; padding: 1.5rem; background: var(--white); border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--gray-200);">
                         <div style="background: linear-gradient(135deg, #3776ab, #4b8bbe); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
                             <i class="fab fa-python" style="font-size: 1.8rem;"></i>
@@ -1759,6 +1759,13 @@ const UnityDashboard = {
                         <h4 style="color: var(--gray-800); margin-bottom: 0.5rem;">Unity</h4>
                         <p style="color: var(--gray-600); font-size: 0.9rem;">Game Engine</p>
                     </div>
+                    <div style="text-align: center; padding: 1.5rem; background: var(--white); border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--gray-200);">
+                        <div style="background: linear-gradient(135deg, #8B5CF6, #7C3AED); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <i class="fas fa-robot" style="font-size: 1.8rem;"></i>
+                        </div>
+                        <h4 style="color: var(--gray-800); margin-bottom: 0.5rem;">Llama 3.2</h4>
+                        <p style="color: var(--gray-600); font-size: 0.9rem;">Ollama + Chatbot</p>
+                    </div>
                 </div>
             </div>
             
@@ -1784,15 +1791,23 @@ const UnityDashboard = {
                         </div>
                         <div class="unity-data-row">
                             <i class="fas fa-brain"></i>
-                            <span><strong>IA:</strong> Análise de solo inteligente</span>
+                            <span><strong>IA:</strong> Análise de solo + Chatbot Llama 3.2</span>
                         </div>
                         <div class="unity-data-row">
                             <i class="fas fa-plug"></i>
-                            <span><strong>Endpoints:</strong> 8 rotas REST</span>
+                            <span><strong>Endpoints:</strong> 10 rotas REST</span>
                         </div>
                         <div class="unity-data-row">
-                            <i class="fas fa-satellite"></i>
-                            <span><strong>Postman:</strong> Testes de API</span>
+                            <i class="fas fa-comments"></i>
+                            <span><strong>Ollama:</strong> LLM local com streaming</span>
+                        </div>
+                        <div class="unity-data-row">
+                            <i class="fas fa-database"></i>
+                            <span><strong>RAG:</strong> Base local + Busca web + Clima</span>
+                        </div>
+                        <div class="unity-data-row">
+                            <i class="fas fa-memory"></i>
+                            <span><strong>Memória:</strong> SQLite persistente</span>
                         </div>
                     </div>
                 </div>
@@ -1827,6 +1842,18 @@ const UnityDashboard = {
                             <i class="fas fa-icons"></i>
                             <span><strong>Font Awesome:</strong> Biblioteca de ícones</span>
                         </div>
+                        <div class="unity-data-row">
+                            <i class="fas fa-robot"></i>
+                            <span><strong>Chatbot:</strong> Sessões isoladas + Histórico</span>
+                        </div>
+                        <div class="unity-data-row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span><strong>Localização:</strong> Botão clima INMET</span>
+                        </div>
+                        <div class="unity-data-row">
+                            <i class="fas fa-lightbulb"></i>
+                            <span><strong>Dicas IA:</strong> Popup com recomendações</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1843,6 +1870,10 @@ const UnityDashboard = {
                     <div style="margin-bottom: 0.5rem;"><span style="color: var(--secondary-green);">POST</span> <span style="color: var(--amber);">/unity/soil/save/{unity_id}</span> <span style="color: var(--gray-400);">// Salvar dados</span></div>
                     <div style="margin-bottom: 0.5rem;"><span style="color: var(--tech-blue);">GET</span> <span style="color: var(--amber);">/unity/dashboard/{unity_id}</span> <span style="color: var(--gray-400);">// Dashboard</span></div>
                     <div style="margin-bottom: 0.5rem;"><span style="color: var(--tech-blue);">GET</span> <span style="color: var(--amber);">/unity/analise-ia/{unity_id}</span> <span style="color: var(--gray-400);">// Análise IA</span></div>
+                    <div style="margin-bottom: 0.5rem;"><span style="color: var(--secondary-green);">POST</span> <span style="color: var(--amber);">/api/chat/{unity_id}</span> <span style="color: var(--gray-400);">// Chatbot Llama</span></div>
+                    <div style="margin-bottom: 0.5rem;"><span style="color: var(--secondary-green);">POST</span> <span style="color: var(--amber);">/api/generate_title</span> <span style="color: var(--gray-400);">// Títulos IA</span></div>
+                    <div style="margin-bottom: 0.5rem;"><span style="color: var(--secondary-green);">POST</span> <span style="color: var(--amber);">/api/soil-tips/{unity_id}</span> <span style="color: var(--gray-400);">// Dicas solo</span></div>
+                    <div style="margin-bottom: 0.5rem;"><span style="color: var(--tech-blue);">GET</span> <span style="color: var(--amber);">/unity/monitoring/{unity_id}</span> <span style="color: var(--gray-400);">// Monitoramento</span></div>
                 </div>
             </div>
             
@@ -1853,20 +1884,20 @@ const UnityDashboard = {
                 </h3>
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;">
                     <div style="text-align: center; padding: 1.5rem; background: var(--gray-50); border-radius: 12px; border: 2px solid var(--secondary-green);">
-                        <div style="font-size: 2rem; font-weight: 700; color: var(--secondary-green); margin-bottom: 0.5rem;">4.5k+</div>
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--secondary-green); margin-bottom: 0.5rem;">5k+</div>
                         <div style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">Linhas de Código</div>
                     </div>
                     <div style="text-align: center; padding: 1.5rem; background: var(--gray-50); border-radius: 12px; border: 2px solid var(--tech-blue);">
-                        <div style="font-size: 2rem; font-weight: 700; color: var(--tech-blue); margin-bottom: 0.5rem;">15+</div>
-                        <div style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">Arquivos JS/CSS</div>
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--tech-blue); margin-bottom: 0.5rem;">25+</div>
+                        <div style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">Arquivos Totais</div>
                     </div>
                     <div style="text-align: center; padding: 1.5rem; background: var(--gray-50); border-radius: 12px; border: 2px solid var(--purple);">
-                        <div style="font-size: 2rem; font-weight: 700; color: var(--purple); margin-bottom: 0.5rem;">3</div>
-                        <div style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">Coleções no Banco de Dados</div>
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--purple); margin-bottom: 0.5rem;">11</div>
+                        <div style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">Endpoints API</div>
                     </div>
                     <div style="text-align: center; padding: 1.5rem; background: var(--gray-50); border-radius: 12px; border: 2px solid var(--orange);">
-                        <div style="font-size: 2rem; font-weight: 700; color: var(--orange); margin-bottom: 0.5rem;">3</div>
-                        <div style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">Meses de Desenvolvimento</div>
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--orange); margin-bottom: 0.5rem;">8</div>
+                        <div style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">Seções Dashboard</div>
                     </div>
                 </div>
             </div>
@@ -1962,6 +1993,41 @@ const UnityDashboard = {
     
     showEmpty(elementId, message = 'Nenhum dado encontrado') {
         this.showError(elementId, message);
+    },
+    
+    async showSoilTips(parametro, valor, nomeParametro) {
+        const modal = document.createElement('div');
+        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:10000;';
+        modal.innerHTML = `
+            <div style="background:white;border-radius:16px;padding:2rem;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+                    <h3 style="color:var(--gray-800);margin:0;display:flex;align-items:center;gap:0.5rem;">
+                        <i class="fas fa-lightbulb" style="color:var(--secondary-green);"></i>
+                        Dicas para ${nomeParametro}
+                    </h3>
+                    <button onclick="this.closest('div[style*=fixed]').remove()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--gray-600);">&times;</button>
+                </div>
+                <div style="background:var(--gray-50);padding:1rem;border-radius:8px;margin-bottom:1rem;">
+                    <strong>Valor atual:</strong> ${valor}
+                </div>
+                <div id="tips-content" style="color:var(--gray-700);line-height:1.6;">
+                    <i class="fas fa-spinner fa-spin"></i> Gerando dicas...
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        try {
+            const response = await fetch(`${this.baseUrl}/api/soil-tips/${this.currentUnityId}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({parametro: nomeParametro, valor: valor, cultivo: this.currentUserData?.profile?.propriedade?.cultivo_principal || 'cultivo geral'})
+            });
+            const data = await response.json();
+            document.getElementById('tips-content').innerHTML = data.tips.replace(/\n/g, '<br>');
+        } catch (error) {
+            document.getElementById('tips-content').innerHTML = 'Erro ao carregar dicas. Tente novamente.';
+        }
     }
 };
 

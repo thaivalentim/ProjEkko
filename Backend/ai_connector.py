@@ -23,7 +23,12 @@ def get_ollama_response(prompt: str, stream: bool = False):
             {"role": "system", "content": "Você é Ekko, assistente de agricultura."},
             {"role": "user", "content": prompt}
         ],
-        "stream": stream
+        "stream": stream,
+        "options": {
+            "num_predict": 500,
+            "temperature": 0.7,
+            "top_p": 0.9
+        }
     }
     
     try:

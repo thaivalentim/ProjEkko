@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Diagnóstico Chat EKKO</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1e1e1e; color: #00ff00; }
+        .ok { color: #00ff00; }
+        .erro { color: #ff0000; }
+        .info { color: #ffff00; }
+        button { padding: 10px; margin: 5px; cursor: pointer; }
+        pre { background: #000; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Diagnóstico Chat EKKO</h1>
+    
+    <h2>1. Unity ID</h2>
+    <div id="unity-id"></div>
+    
+    <h2>2. Chaves no localStorage</h2>
+    <div id="storage-keys"></div>
+    
+    <h2>3. Sessões Carregadas</h2>
+    <div id="sessions"></div>
+    
+    <h2>4. Ações</h2>
+    <button onclick="limparTudo()">Limpar TUDO</button>
+    <button onclick="criarSessaoTeste()">Criar Sessão Teste</button>
+    <button onclick="location.reload()">Recarregar</button>
+    
+    <h2>5. Console</h2>
+    <pre id="console"></pre>
+
+    <script>
+        const log = (msg, tipo = 'info') => {
+            const consoleDiv = document.getElementById('console');
+            const span = document.createElement('span');
+            span.className = tipo;
+            span.textContent = `[${new Date().toLocaleTimeString()}] ${msg}\n`;
+            consoleDiv.appendChild(span);
+            console.log(msg);
+        };
+
+        // 1. Verificar Unity ID
+        const unityId = localStorage.getItem('unityId');
+        const unityDiv = document.getElementById('unity-id');
+        if (unityId) {
+            unityDiv.innerHTML = `<span class="ok">✓ Unity ID: ${unityId}</span>`;
+            log(`Unity ID encontrado: ${unityId}`, 'ok');
+        } else {
+            unityDiv.innerHTML = `<span class="erro">✗ Unity ID não encontrado!</span>`;
+            log('ERRO: Unity ID não encontrado', 'erro');
+        }
+
+        // 2. Listar chaves
+        const keysDiv = document.getElementById('storage-keys');
+        const allKeys = Object.keys(localStorage).filter(k => k.includes('ekko'));
+        if (allKeys.length > 0) {
+            keysDiv.innerHTML = '<span class="ok">✓ Chaves encontradas:</span><ul>' + 
+                allKeys.map(k => `<li>${k}</li>`).join('') + '</ul>';
+            log(`${allKeys.length} chaves encontradas`, 'ok');
+        } else {
+            keysDiv.innerHTML = '<span class="info">⚠ Nenhuma chave encontrada</span>';
+            log('Nenhuma chave encontrada', 'info');
+        }
+
+        // 3. Verificar sessões
+        const sessionsDiv = document.getElementById('sessions');
+        if (unityId) {
+            const storageKey = `ekkoChatSessions_${unityId}`;
+            const sessionsData = localStorage.getItem(storageKey);
+            
+            if (sessionsData) {
+                try {
+                    const sessions = JSON.parse(sessionsData);
+                    const count = Object.keys(sessions).length;
+                    sessionsDiv.innerHTML = `<span class="ok">✓ ${count} sessões encontradas</span>`;
+                    log(`${count} sessões carregadas`, 'ok');
+                } catch (e) {
+                    sessionsDiv.innerHTML = `<span class="erro">✗ Erro ao parsear sessões: ${e.message}</span>`;
+                    log(`ERRO ao parsear: ${e.message}`, 'erro');
+                }
+            } else {
+                sessionsDiv.innerHTML = '<span class="info">⚠ Nenhuma sessão salva</span>';
+                log('Nenhuma sessão salva', 'info');
+            }
+        }
+
+        function limparTudo() {
+            if (confirm('Limpar TODAS as conversas de TODOS os usuários?')) {
+                Object.keys(localStorage)
+                    .filter(k => k.includes('ekko'))
+                    .forEach(k => {
+                        localStorage.removeItem(k);
+                        log(`Removido: ${k}`, 'info');
+                    });
+                alert('Tudo limpo!');
+                location.reload();
+            }
+        }
+
+        function criarSessaoTeste() {
+            if (!unityId) {
+                alert('Unity ID não encontrado!');
+                return;
+            }
+            
+            const storageKey = `ekkoChatSessions_${unityId}`;
+            const activeKey = `ekkoActiveSessionId_${unityId}`;
+            
+            const sessionId = `session_${Date.now()}`;
+            const sessions = {
+                [sessionId]: {
+                    title: 'Teste',
+                    history: '<div class="message bot-message">Teste OK!</div>'
+                }
+            };
+            
+            localStorage.setItem(storageKey, JSON.stringify(sessions));
+            localStorage.setItem(activeKey, sessionId);
+            
+            log('Sessão teste criada!', 'ok');
+            alert('Sessão teste criada! Recarregue a página.');
+        }
+
+        log('Diagnóstico completo', 'ok');
+    </script>
+</body>
+</html>
